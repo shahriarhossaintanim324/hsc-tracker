@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://USERNAME.github.io/REPO/sitemap.xml
+Sitemap: https://shahriarhossaintanim324.github.io/hsc-tracker/sitemap.xml
