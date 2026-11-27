@@ -1,0 +1,3024 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HSC Life Countdown ও Academic Tracker — HSC পরীক্ষার কাউন্টডাউন, সিলেবাস ও রিভিশন ট্র্যাকার</title>
+  <meta name="description" content="HSC পরীক্ষার কাউন্টডাউন, লাইফ ক্যালেন্ডার, সিলেবাস সম্পন্নের হার, দৈনিক পড়ার হিসাব, জার্নাল ও স্বয়ংক্রিয় রিভিশন রিমাইন্ডার — বিনামূল্যে বাংলা HSC স্টাডি ট্র্যাকার। Free HSC countdown and academic tracker.">
+  <link rel="canonical" href="https://USERNAME.github.io/REPO/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HSC Life Countdown & Academic Tracker">
+  <meta property="og:description" content="HSC কাউন্টডাউন, সিলেবাস ট্র্যাকার ও রিভিশন রিমাইন্ডার।">
+  <meta property="og:url" content="https://USERNAME.github.io/REPO/">
+  <!-- Search Console HTML-tag verification: uncomment and paste your code -->
+  <!-- <meta name="google-site-verification" content="YOUR_CODE"> -->
+
+  <!-- Bangla & English Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            bangla: ['"Hind Siliguri"', '"Inter"', 'sans-serif'],
+            serifBangla: ['"Tiro Bangla"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            slateDark: {
+              950: '#070B14',
+              900: '#0D1322',
+              850: '#131B2E',
+              800: '#1A243D',
+              700: '#273556',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Hind Siliguri', 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.45);
+    }
+
+    /* Pulsing Today Ring */
+    @keyframes pulse-ring {
+      0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.75);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+      }
+    }
+
+    .today-cell {
+      animation: pulse-ring 2s infinite;
+    }
+
+    /* Life Grid Cell Transitions */
+    .life-cell {
+      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.14s ease, border-color 0.14s ease;
+    }
+    .life-cell:hover {
+      transform: scale(1.38);
+      z-index: 20;
+    }
+
+    /* Subtle Glass Effect */
+    .glass-card {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+  <style id="ov-styles">
+    /* Overview page additions (additive only) */
+    @keyframes ov-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes ov-fade-o { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes ov-growy { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes ov-growx { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .ov-fade { animation: ov-fade .4s cubic-bezier(.22,1,.36,1) both; }
+    .ov-fade-o { animation: ov-fade-o .3s ease both; }
+    .ov-bar { transform-origin: bottom; animation: ov-growy .55s cubic-bezier(.22,1,.36,1) both; }
+    .ov-hbar { transform-origin: left; animation: ov-growx .6s cubic-bezier(.22,1,.36,1) both; }
+    .ov-ring { transition: stroke-dashoffset .9s cubic-bezier(.22,1,.36,1); }
+    @media (prefers-reduced-motion: reduce) {
+      .ov-fade, .ov-fade-o, .ov-bar, .ov-hbar { animation: none; }
+      .ov-ring { transition: none; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slateDark-950 dark:text-slate-100 min-h-screen transition-colors duration-300 selection:bg-emerald-500/30 selection:text-emerald-300">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+  <!-- Floating Tooltip for Life Grid -->
+  <div id="grid-tooltip" class="fixed z-50 pointer-events-none hidden bg-slate-900/95 dark:bg-slateDark-800/95 text-white border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs shadow-2xl backdrop-blur-md transition-opacity duration-100">
+    <div id="tooltip-date" class="font-semibold text-amber-400 mb-0.5"></div>
+    <div id="tooltip-daynum" class="text-slate-300 mb-1.5"></div>
+    <div id="tooltip-stats" class="flex items-center gap-3 text-emerald-300 font-medium"></div>
+    <div id="tooltip-hint" class="text-[11px] text-slate-400 mt-1 border-t border-slate-700/70 pt-1"></div>
+  </div>
+
+  <!-- TOP NAVIGATION & PROFILE HEADER -->
+  <header class="sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slateDark-950/85 glass-card">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand & Core Quote -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0">
+          <i data-lucide="hourglass" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white" data-i18n="appTitle">
+              HSC জীবন কাউন্টডাউন
+            </h1>
+            <span id="header-level-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+              HSC প্রথম বর্ষ
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-serifBangla italic" data-i18n="coreMotto">
+            “প্রতিটি অতিবাহিত দিন মানে আমার HSC যাত্রার একটি দিন কমে যাওয়া।”
+          </p>
+        </div>
+      </div>
+
+      <!-- Goal Pills & Controls -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <!-- Academic & Dream Goal Badges (Desktop) -->
+        <div class="hidden xl:flex items-center gap-2">
+          <div class="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-amber-500"></i>
+            <span id="header-academic-goal">HSC GPA 5.00</span>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center gap-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
+            <i data-lucide="target" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span id="header-dream-goal">BUET / সরকারি মেডিকেল</span>
+          </div>
+        </div>
+
+        <!-- Language Toggle -->
+        <button id="lang-toggle-btn" onclick="toggleLanguage()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 dark:hover:bg-slateDark-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/80 transition flex items-center gap-1.5 cursor-pointer" title="Switch Language">
+          <i data-lucide="languages" class="w-4 h-4 text-emerald-500"></i>
+          <span id="lang-label">EN / বাংলা</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 dark:hover:bg-slateDark-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/80 transition cursor-pointer" title="Toggle Dark/Light Theme">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-indigo-600"></i>
+        </button>
+
+        <!-- Settings Button -->
+        <button onclick="openSettingsModal()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20 transition flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+          <span data-i18n="settingsBtn">সেটিংস</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE NAVIGATION (Overview / My Tracker) -->
+  <nav id="page-nav" aria-label="Pages" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+    <div class="flex w-full sm:w-auto sm:inline-flex gap-1 p-1 rounded-2xl bg-slate-100 dark:bg-slateDark-900 border border-slate-200 dark:border-slate-800">
+      <button id="nav-overview" type="button" onclick="switchPage('overview')" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer"></button>
+      <button id="nav-tracker" type="button" onclick="switchPage('tracker')" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer"></button>
+    </div>
+  </nav>
+
+  <!-- =========================================================
+       PAGE 1: OVERVIEW (default landing page)
+       ========================================================= -->
+  <div id="page-overview">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 font-bangla">
+      <div id="ov-quote"></div>
+      <div id="ov-summary"></div>
+      <div id="ov-syllabus"></div>
+      <div id="ov-weekly"></div>
+      <div id="ov-revision"></div>
+    </main>
+  </div>
+
+  <!-- =========================================================
+       PAGE 2: MY TRACKER (the original dashboard, unchanged)
+       ========================================================= -->
+  <div id="page-tracker" class="hidden">
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- Mobile Goal Banner -->
+    <div class="flex xl:hidden flex-wrap items-center gap-2 bg-white dark:bg-slateDark-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <div class="px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+        <i data-lucide="award" class="w-3.5 h-3.5 text-amber-500"></i>
+        <span id="mobile-academic-goal">HSC GPA 5.00</span>
+      </div>
+      <div class="px-3 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center gap-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
+        <i data-lucide="target" class="w-3.5 h-3.5 text-indigo-400"></i>
+        <span id="mobile-dream-goal">BUET / সরকারি মেডিকেল</span>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         SECTION 1: HSC LIFE COUNTDOWN & GITHUB-STYLE LIFE GRID
+         ========================================================= -->
+    <section class="bg-white dark:bg-slateDark-900 rounded-3xl border border-slate-200 dark:border-slate-800/90 p-5 sm:p-7 shadow-xl shadow-slate-900/5 dark:shadow-black/30 relative overflow-hidden">
+      <!-- Decorative Ambient Glow -->
+      <div class="absolute -top-24 -right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Top Row: Live Digital Countdown + Mark Today Button -->
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-200/80 dark:border-slate-800/80">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span data-i18n="liveCountdownLabel">লাইভ HSC পরীক্ষার কাউন্টডাউন</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5 flex-wrap">
+            <span data-i18n="examTargetTitle">লক্ষ্য: HSC বোর্ড পরীক্ষা</span>
+            <span id="display-exam-date" class="text-sm sm:text-base font-medium px-3 py-1 rounded-xl bg-slate-100 dark:bg-slateDark-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"></span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1" id="journey-range-subtitle"></p>
+        </div>
+
+        <!-- Live Ticking Clock Boxes -->
+        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+          <div class="bg-slate-100 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-3.5 py-2.5 min-w-[72px] sm:min-w-[84px] text-center">
+            <div id="cd-days" class="text-2xl sm:text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400">000</div>
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400" data-i18n="daysUnit">দিন</div>
+          </div>
+          <div class="bg-slate-100 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-3.5 py-2.5 min-w-[68px] sm:min-w-[78px] text-center">
+            <div id="cd-hours" class="text-2xl sm:text-3xl font-bold font-mono text-slate-800 dark:text-white">00</div>
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400" data-i18n="hoursUnit">ঘণ্টা</div>
+          </div>
+          <div class="bg-slate-100 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-3.5 py-2.5 min-w-[68px] sm:min-w-[78px] text-center">
+            <div id="cd-mins" class="text-2xl sm:text-3xl font-bold font-mono text-slate-800 dark:text-white">00</div>
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400" data-i18n="minsUnit">মিনিট</div>
+          </div>
+          <div class="bg-slate-100 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-3.5 py-2.5 min-w-[68px] sm:min-w-[78px] text-center">
+            <div id="cd-secs" class="text-2xl sm:text-3xl font-bold font-mono text-amber-500">00</div>
+            <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400" data-i18n="secsUnit">সেকেন্ড</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Key Metrics Cards -->
+      <div class="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 my-6">
+        <!-- Total Days -->
+        <div class="bg-slate-50 dark:bg-slateDark-850/90 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">
+            <span data-i18n="totalDaysLabel">মোট প্রস্তুতির দিন</span>
+            <i data-lucide="calendar-range" class="w-4 h-4 text-indigo-400"></i>
+          </div>
+          <div id="stat-total-days" class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">500</div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" id="stat-months-approx">~১৬.৫ মাস</div>
+        </div>
+
+        <!-- Passed Days -->
+        <div class="bg-slate-50 dark:bg-slateDark-850/90 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">
+            <span data-i18n="passedDaysLabel">অতিবাহিত দিন</span>
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-rose-400"></i>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="stat-passed-days" class="text-2xl sm:text-3xl font-bold text-rose-500 dark:text-rose-400">0</span>
+            <span id="stat-passed-pct" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 dark:text-rose-400">0%</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" data-i18n="passedSub">ক্যালেন্ডার অনুযায়ী স্বয়ংক্রিয়</div>
+        </div>
+
+        <!-- Remaining Days -->
+        <div class="bg-slate-50 dark:bg-slateDark-850/90 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">
+            <span data-i18n="remainingDaysLabel">বাকি দিন</span>
+            <i data-lucide="flame" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="stat-remaining-days" class="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">0</span>
+            <span id="stat-remaining-pct" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">100%</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" data-i18n="remainingSub">প্রতিটি দিন মূল্যবান</div>
+        </div>
+
+        <!-- Study Streak & Total Hours -->
+        <div class="bg-slate-50 dark:bg-slateDark-850/90 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium mb-1">
+            <span data-i18n="streakLabel">টানা পড়ার রেকর্ড</span>
+            <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span id="stat-streak" class="text-2xl sm:text-3xl font-bold text-amber-500">0</span>
+            <span class="text-xs font-medium text-slate-500 dark:text-slate-400" data-i18n="daysUnit">দিন</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" id="stat-total-logged-hours">মোট পড়া: ০ ঘণ্টা</div>
+        </div>
+      </div>
+
+      <!-- Journey Elapsed vs Remaining Progress Bar -->
+      <div class="relative z-10 mb-7">
+        <div class="flex items-center justify-between text-xs font-medium mb-2">
+          <span class="text-rose-500 dark:text-rose-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            <span id="bar-elapsed-text">সময় অতিবাহিত: ০%</span>
+          </span>
+          <span class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+            <span id="bar-remaining-text">বাকি সময়: ১০০%</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          </span>
+        </div>
+        <div class="w-full h-3.5 bg-slate-200 dark:bg-slateDark-800 rounded-full overflow-hidden p-0.5 border border-slate-300/60 dark:border-slate-700/60">
+          <div id="journey-progress-fill" class="h-full rounded-full bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500 transition-all duration-700" style="width: 10%"></div>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           GITHUB-STYLE HSC LIFE GRID
+           ========================================================= -->
+      <div class="relative z-10 bg-slate-50/90 dark:bg-slateDark-950/75 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="layout-grid" class="w-5 h-5 text-emerald-500"></i>
+              <span data-i18n="lifeGridTitle">HSC জীবন গ্রিড (প্রতিটি ঘর = জীবনের ১টি দিন)</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="lifeGridSubtitle">
+              অতীতের বা আজকের যেকোনো ঘরে ক্লিক করে সেই দিনের পড়াশোনার রেকর্ড দেখুন বা আপডেট করুন।
+            </p>
+          </div>
+
+          <!-- Action Button: Mark Today as Passed/Productive -->
+          <div class="flex items-center gap-2.5">
+            <button id="mark-today-btn" onclick="toggleTodayPassed()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 cursor-pointer shadow-md">
+              <i data-lucide="check-square" class="w-4 h-4"></i>
+              <span id="mark-today-btn-text">আজকের দিনটি সম্পন্ন চিহ্নিত করুন</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Grid Container -->
+        <div id="life-grid-wrapper" class="max-h-[310px] overflow-y-auto pr-1 py-2">
+          <div id="life-grid" class="flex flex-wrap gap-[5px] sm:gap-[6px]">
+            <!-- Squares injected dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Grid Legend -->
+        <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-[4px] bg-slate-300/70 dark:bg-slate-700/70 inline-block"></span>
+              <span data-i18n="legendPassedEmpty">অতিবাহিত (০ ঘণ্টা)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-[4px] bg-emerald-300 dark:bg-emerald-900 border border-emerald-500/40 inline-block"></span>
+              <span>১-৩ ঘণ্টা</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-[4px] bg-emerald-400 dark:bg-emerald-600 inline-block"></span>
+              <span>৪-৬ ঘণ্টা</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-[4px] bg-emerald-500 dark:bg-emerald-400 shadow-sm shadow-emerald-400/50 inline-block"></span>
+              <span>৭+ ঘণ্টা / সম্পন্ন</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-[4px] bg-amber-400 ring-2 ring-amber-400/50 inline-block"></span>
+              <span data-i18n="legendToday">আজকের দিন</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded-[4px] border border-dashed border-slate-400 dark:border-slate-600 bg-transparent inline-block"></span>
+              <span data-i18n="legendFuture">ভবিষ্যৎ দিন</span>
+            </div>
+          </div>
+
+          <div id="grid-summary-caption" class="font-medium text-slate-600 dark:text-slate-300"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 2: DAILY ACADEMIC TRACKER & FOCUS TIMER
+         ========================================================= -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left 8 Cols: Daily Subject Checklist & Logs -->
+      <div class="lg:col-span-8 bg-white dark:bg-slateDark-900 rounded-3xl border border-slate-200 dark:border-slate-800/90 p-5 sm:p-6 shadow-xl shadow-slate-900/5 dark:shadow-black/30">
+        <!-- Date Header & Quick Navigation -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="selected-day-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30">
+                আজকের রেকর্ড
+              </span>
+              <span id="selected-day-number" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+            </div>
+            <h2 id="selected-date-heading" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1.5">
+              দৈনিক একাডেমিক ট্র্যাকার
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="navigateSelectedDate(-1)" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 dark:hover:bg-slateDark-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer" title="Previous Day">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button id="back-to-today-btn" onclick="selectToday()" class="hidden px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition items-center gap-1.5 cursor-pointer shadow-sm">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span data-i18n="backToToday">আজকে ফিরে যান</span>
+            </button>
+            <button id="next-day-btn" onclick="navigateSelectedDate(1)" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 dark:hover:bg-slateDark-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer" title="Next Day">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Daily Summary Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 my-5">
+          <div class="bg-slate-50 dark:bg-slateDark-850 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-xs text-slate-500 dark:text-slate-400" data-i18n="dailyStudyTotal">মোট পড়াশোনার সময়</div>
+              <div id="daily-total-hours-display" class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">০ ঘণ্টা ০ মিনিট</div>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-500">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slateDark-850 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-xs text-slate-500 dark:text-slate-400" data-i18n="subjectsDoneLabel">সম্পন্ন বিষয়সমূহ</div>
+              <div id="daily-subjects-count" class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">০ / ৭</div>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center text-indigo-500">
+              <i data-lucide="book-open-check" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slateDark-850 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-center">
+            <div class="flex items-center justify-between text-xs mb-1.5 gap-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span id="daily-goal-label-text" class="text-slate-500 dark:text-slate-400">দৈনিক লক্ষ্য (৫ ঘণ্টা)</span>
+                <button type="button" onclick="toggleQuickGoalEditor()" class="px-1.5 py-0.5 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-amber-300 text-[10px] font-semibold transition flex items-center gap-0.5 cursor-pointer" title="Edit Daily Study Goal">
+                  <i data-lucide="pencil" class="w-2.5 h-2.5"></i>
+                  <span data-i18n="editGoalBtn">এডিট</span>
+                </button>
+              </div>
+              <span id="daily-goal-pct" class="font-bold text-amber-500 shrink-0">0%</span>
+            </div>
+
+            <!-- Inline Quick Goal Editor -->
+            <div id="quick-goal-editor" class="hidden items-center justify-between gap-1.5 mb-2 bg-white dark:bg-slateDark-900 p-1.5 rounded-xl border border-amber-500/40">
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="adjustDailyGoalHours(-0.5)" class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 text-xs font-bold cursor-pointer">-</button>
+                <input type="number" id="quick-goal-input" step="0.5" min="1" max="16" onchange="setDailyGoalHours(this.value)" class="w-12 text-center text-xs font-mono font-bold bg-transparent focus:outline-none text-slate-800 dark:text-white" />
+                <button type="button" onclick="adjustDailyGoalHours(0.5)" class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 text-xs font-bold cursor-pointer">+</button>
+                <span class="text-[10px] text-slate-400" data-i18n="hoursUnit">ঘণ্টা</span>
+              </div>
+              <button type="button" onclick="toggleQuickGoalEditor(false)" class="px-2 py-1 rounded-lg bg-emerald-500 text-slate-950 text-[10px] font-bold cursor-pointer">
+                OK
+              </button>
+            </div>
+
+            <div class="w-full h-2.5 bg-slate-200 dark:bg-slateDark-700 rounded-full overflow-hidden">
+              <div id="daily-goal-bar" class="h-full bg-gradient-to-r from-emerald-500 to-amber-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Checklist Cards -->
+        <div id="subject-checklist-container" class="space-y-3.5">
+          <!-- Subject rows injected dynamically -->
+        </div>
+
+      </div>
+
+      <!-- Right 4 Cols: Live Study Timer + Syllabus & Weekly Consistency -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Live Focus Study Timer -->
+        <div class="bg-gradient-to-br from-slate-900 via-slateDark-900 to-indigo-950 text-white rounded-3xl border border-slate-800 p-5 sm:p-6 shadow-xl relative overflow-hidden">
+          <div class="absolute -right-10 -top-10 w-36 h-36 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <i data-lucide="timer" class="w-4 h-4"></i>
+              <span data-i18n="focusTimerTitle">ফোকাস স্টাডি টাইমার</span>
+            </span>
+            <span id="timer-status-pill" class="text-[11px] px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300">প্রস্তুত</span>
+          </div>
+
+          <!-- Subject Selector for Timer -->
+          <div class="mb-4">
+            <select id="timer-subject-select" class="w-full rounded-xl bg-white/10 border border-white/15 px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <!-- Timer Display -->
+          <div class="text-center my-4">
+            <div id="stopwatch-display" class="text-4xl sm:text-5xl font-bold font-mono tracking-wider text-white">
+              00:00:00
+            </div>
+            <p class="text-xs text-slate-400 mt-1.5" data-i18n="timerHint">পড়া শেষে “সময় যোগ করুন” চাপলে নির্বাচিত বিষয়ে যুক্ত হবে</p>
+          </div>
+
+          <!-- Timer Controls -->
+          <div class="grid grid-cols-3 gap-2 mt-4">
+            <button id="timer-start-btn" onclick="toggleStopwatch()" class="col-span-2 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition cursor-pointer shadow-lg shadow-emerald-500/20">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span id="timer-start-label">শুরু করুন</span>
+            </button>
+            <button onclick="saveStopwatchToSubject()" class="py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs flex items-center justify-center gap-1 transition cursor-pointer" title="Log elapsed minutes to selected subject">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span data-i18n="logBtn">যোগ করুন</span>
+            </button>
+          </div>
+          <div class="mt-2 text-center">
+            <button onclick="resetStopwatch()" class="text-[11px] text-slate-400 hover:text-white underline cursor-pointer" data-i18n="resetTimer">টাইমার রিসেট</button>
+          </div>
+        </div>
+
+        <!-- Last 7 Days Consistency Chart -->
+        <div class="bg-white dark:bg-slateDark-900 rounded-3xl border border-slate-200 dark:border-slate-800/90 p-5 sm:p-6 shadow-xl shadow-slate-900/5 dark:shadow-black/30">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-500"></i>
+              <span data-i18n="weeklyChartTitle">গত ৭ দিনের ধারাবাহিকতা</span>
+            </h3>
+            <span id="weekly-avg-label" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">গড়: ০ ঘণ্টা</span>
+          </div>
+          <div id="weekly-bars-container" class="grid grid-cols-7 gap-2 items-end h-36 pt-4 px-1">
+            <!-- Bars injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Syllabus & Subject-Wise Mastery Overview -->
+        <div class="bg-white dark:bg-slateDark-900 rounded-3xl border border-slate-200 dark:border-slate-800/90 p-5 sm:p-6 shadow-xl shadow-slate-900/5 dark:shadow-black/30">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i>
+              <span data-i18n="syllabusOverviewTitle">বিষয়ভিত্তিক সিলেবাস ও মোট সময়</span>
+            </h3>
+            <button onclick="openSettingsModal()" class="text-xs text-indigo-500 hover:underline cursor-pointer" data-i18n="editChaptersLink">অধ্যায় আপডেট</button>
+          </div>
+          <div id="syllabus-progress-list" class="space-y-3.5">
+            <!-- Subject syllabus progress injected dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SECTION 3: DAILY JOURNAL (Today's reflection + Previous days)
+         ========================================================= -->
+    <section id="journal-section" class="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-6 items-stretch font-bangla">
+
+      <!-- Left (~60%): Today's journal -->
+      <div class="lg:col-span-3 flex flex-col bg-white dark:bg-slateDark-900 rounded-3xl border border-slate-200 dark:border-slate-800/90 p-5 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-1.5 sm:gap-4 mb-5">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="journalTodayTitle">আজকের ডায়েরি</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="journalTodaySub">দিন শেষে নিজের সঙ্গে একটু কথা বলো</p>
+          </div>
+          <div id="journal-today-date" class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 sm:text-right sm:pt-1"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="journal-learned" class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2" data-i18n="journalLearned">আজ কী শিখলাম?</label>
+            <textarea id="journal-learned" class="w-full h-32 resize-none rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 px-4 py-3 text-sm leading-relaxed text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/40 transition" oninput="saveTodayJournal()"></textarea>
+          </div>
+          <div>
+            <label for="journal-unfinished" class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2" data-i18n="journalUnfinished">কী শেষ করতে পারিনি?</label>
+            <textarea id="journal-unfinished" class="w-full h-32 resize-none rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 px-4 py-3 text-sm leading-relaxed text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/40 transition" oninput="saveTodayJournal()"></textarea>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label for="journal-tomorrow" class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2" data-i18n="journalTomorrow">আগামীকাল কী করব?</label>
+          <textarea id="journal-tomorrow" class="w-full h-32 resize-none rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 px-4 py-3 text-sm leading-relaxed text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/40 transition" oninput="saveTodayJournal()"></textarea>
+        </div>
+
+        <div class="mt-5 pt-5 border-t border-slate-200 dark:border-slate-800">
+          <label for="journal-productivity" id="journal-prod-label" class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">আজকের উৎপাদনশীলতা: ৩/৫</label>
+          <input id="journal-productivity" type="range" min="1" max="5" step="1" value="3" oninput="onJournalSlider()"
+            class="w-full h-2 cursor-pointer accent-emerald-500" />
+        </div>
+      </div>
+
+      <!-- Right (~40%): Previous days -->
+      <div class="lg:col-span-2 flex flex-col bg-white dark:bg-slateDark-900 rounded-3xl border border-slate-200 dark:border-slate-800/90 p-5 sm:p-6">
+        <div class="flex items-baseline justify-between gap-3 mb-3">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="journalPastTitle">আগের দিনের ডায়েরি</h3>
+          <span class="text-xs text-slate-500 dark:text-slate-400 shrink-0" data-i18n="journalPastHint">তারিখ নির্বাচন করে দেখো।</span>
+        </div>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4" data-i18n="journalPastIntro">আগের দিনের এন্ট্রি দেখতে ক্যালেন্ডারের দিনেও ক্লিক করতে পারো।</p>
+        <input id="journal-date-picker" type="date" onchange="selectJournalDate(this.value)"
+          class="w-full mb-4 rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 px-4 py-2.5 text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition dark:[color-scheme:dark]" />
+        <div id="journal-past-body" class="flex-1 flex flex-col min-h-[12rem] max-h-[26rem] overflow-y-auto"></div>
+      </div>
+    </section>
+
+  </main>
+  </div><!-- /page-tracker -->
+
+  <!-- =========================================================
+       SETTINGS & CONFIGURATION MODAL
+       ========================================================= -->
+  <div id="settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl my-8 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="settingsModalTitle">ব্যক্তিগত কনফিগারেশন ও লক্ষ্য</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="settingsModalSub">আপনার HSC পরীক্ষার তারিখ, লক্ষ্য এবং বিষয়সমূহ কাস্টমাইজ করুন</p>
+          </div>
+        </div>
+        <button onclick="closeSettingsModal()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slateDark-800 text-slate-500 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-5 mt-5">
+        <!-- Student Level & Goals -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgLevelLabel">শিক্ষার্থীর স্তর</label>
+            <input type="text" id="cfg-level" required class="w-full rounded-xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgAcademicGoalLabel">একাডেমিক লক্ষ্য</label>
+            <input type="text" id="cfg-academic-goal" required class="w-full rounded-xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgDreamGoalLabel">দীর্ঘমেয়াদী স্বপ্ন / ভর্তি লক্ষ্য</label>
+            <input type="text" id="cfg-dream-goal" required class="w-full rounded-xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgDailyGoalLabel">দৈনিক পড়ার লক্ষ্য (ঘণ্টা)</label>
+            <input type="number" id="cfg-daily-goal" step="0.5" min="1" max="16" required class="w-full rounded-xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700 px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+
+        <!-- Countdown Dates & Remaining Days -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 dark:bg-slateDark-850/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgStartDateLabel">কাউন্টডাউন শুরুর তারিখ</label>
+            <input type="date" id="cfg-start-date" onchange="syncExamDateFromRemaining()" required class="w-full rounded-xl bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgExamDateLabel">সম্ভাব্য HSC পরীক্ষার তারিখ</label>
+            <input type="date" id="cfg-exam-date" onchange="syncRemainingFromExamDate()" required class="w-full rounded-xl bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" data-i18n="cfgRemainingDaysLabel">বাকি প্রস্তুতির দিন (আজ থেকে)</label>
+            <input type="number" id="cfg-remaining-days" min="1" max="1500" oninput="applyRemainingDaysInput()" class="w-full rounded-xl bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+        </div>
+
+        <!-- Subjects & Syllabus Chapter Manager -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300" data-i18n="cfgSubjectsHeader">বিষয়সমূহ ও সিলেবাস অধ্যায় সংখ্যা</label>
+            <button type="button" onclick="addNewSubjectRow()" class="text-xs font-semibold px-3 py-1 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 flex items-center gap-1 cursor-pointer">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span data-i18n="addSubjectBtn">নতুন বিষয় যোগ</span>
+            </button>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5 grid grid-cols-12 gap-2 px-1">
+            <span class="col-span-6" data-i18n="colSubName">বিষয়ের নাম</span>
+            <span class="col-span-2 text-center" data-i18n="colDoneChap">সম্পন্ন অধ্যায়</span>
+            <span class="col-span-2 text-center" data-i18n="colTotalChap">মোট অধ্যায়</span>
+            <span class="col-span-2 text-right" data-i18n="colAction">মুছুন</span>
+          </div>
+          <div id="settings-subjects-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <!-- Dynamic subject config rows -->
+          </div>
+        </div>
+
+        <!-- Data Backup & Restore (JSON Export / Import) -->
+        <div class="bg-slate-50 dark:bg-slateDark-850/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                <i data-lucide="database-backup" class="w-4 h-4 text-emerald-500"></i>
+                <span data-i18n="backupSectionTitle">ডেটা ব্যাকআপ ও রিস্টোর (JSON)</span>
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="backupSectionSub">
+                অন্য ডিভাইস বা ব্রাউজারে ডেটা নিতে ব্যাকআপ ফাইল ডাউনলোড বা আপলোড করুন।
+              </p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button type="button" onclick="exportBackupData()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5 cursor-pointer transition">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span data-i18n="exportBtn">ব্যাকআপ ডাউনলোড</span>
+              </button>
+              <label class="px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer transition">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span data-i18n="importBtn">রিস্টোর ফাইল</span>
+                <input type="file" id="import-backup-input" accept=".json,application/json" onchange="importBackupData(event)" class="hidden" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 gap-3">
+          <button type="button" onclick="resetToDefaultDemoData()" class="text-xs text-rose-500 hover:underline cursor-pointer" data-i18n="resetDefaultsBtn">
+            ডিফল্ট সেটিংসে ফিরে যান
+          </button>
+          <div class="flex items-center gap-2.5">
+            <button type="button" onclick="closeSettingsModal()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slateDark-800 text-slate-700 dark:text-slate-300 cursor-pointer" data-i18n="cancelBtn">
+              বাতিল
+            </button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 cursor-pointer" data-i18n="saveBtn">
+              সংরক্ষণ করুন
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       APPLICATION JAVASCRIPT LOGIC
+       ========================================================= -->
+  <script>
+    // =========================================================
+    // 1. LOCALIZATION DICTIONARY (BANGLA DEFAULT + ENGLISH)
+    // =========================================================
+    const I18N = {
+      bn: {
+        appTitle: "HSC জীবন কাউন্টডাউন",
+        coreMotto: "“প্রতিটি অতিবাহিত দিন মানে আমার HSC যাত্রার একটি দিন কমে যাওয়া।”",
+        settingsBtn: "সেটিংস",
+        liveCountdownLabel: "লাইভ HSC পরীক্ষার কাউন্টডাউন",
+        examTargetTitle: "লক্ষ্য: HSC বোর্ড পরীক্ষা",
+        daysUnit: "দিন",
+        hoursUnit: "ঘণ্টা",
+        minsUnit: "মিনিট",
+        secsUnit: "সেকেন্ড",
+        totalDaysLabel: "মোট প্রস্তুতির দিন",
+        passedDaysLabel: "অতিবাহিত দিন",
+        passedSub: "ক্যালেন্ডার অনুযায়ী স্বয়ংক্রিয়",
+        remainingDaysLabel: "বাকি দিন",
+        remainingSub: "প্রতিটি দিন মূল্যবান",
+        streakLabel: "টানা পড়ার রেকর্ড",
+        lifeGridTitle: "HSC জীবন গ্রিড (প্রতিটি ঘর = জীবনের ১টি দিন)",
+        lifeGridSubtitle: "অতীতের বা আজকের যেকোনো ঘরে ক্লিক করে সেই দিনের পড়াশোনার রেকর্ড দেখুন বা আপডেট করুন।",
+        markTodayTodo: "আজকের দিনটি সম্পন্ন চিহ্নিত করুন",
+        markTodayDone: "আজকের দিনটি সম্পন্ন হয়েছে ✓",
+        legendPassedEmpty: "অতিবাহিত (০ ঘণ্টা)",
+        legendToday: "আজকের দিন",
+        legendFuture: "ভবিষ্যৎ দিন",
+        backToToday: "আজকে ফিরে যান",
+        dailyStudyTotal: "মোট পড়াশোনার সময়",
+        subjectsDoneLabel: "সম্পন্ন বিষয়সমূহ",
+        dailyGoalLabel: "দৈনিক লক্ষ্য",
+        editGoalBtn: "এডিট",
+        dailyReflectionTitle: "দিনের সারসংক্ষেপ ও আত্মপর্যালোচনা (Daily Reflection)",
+        focusTimerTitle: "ফোকাস স্টাডি টাইমার",
+        timerHint: "পড়া শেষে “যোগ করুন” চাপলে নির্বাচিত বিষয়ে সময় যুক্ত হবে",
+        logBtn: "যোগ করুন",
+        resetTimer: "টাইমার রিসেট",
+        weeklyChartTitle: "গত ৭ দিনের ধারাবাহিকতা",
+        syllabusOverviewTitle: "বিষয়ভিত্তিক সিলেবাস ও মোট সময়",
+        editChaptersLink: "অধ্যায় আপডেট",
+        settingsModalTitle: "ব্যক্তিগত কনফিগারেশন ও লক্ষ্য",
+        settingsModalSub: "আপনার HSC পরীক্ষার তারিখ, লক্ষ্য এবং বিষয়সমূহ কাস্টমাইজ করুন",
+        cfgLevelLabel: "শিক্ষার্থীর স্তর",
+        cfgAcademicGoalLabel: "একাডেমিক লক্ষ্য",
+        cfgDreamGoalLabel: "দীর্ঘমেয়াদী স্বপ্ন / ভর্তি লক্ষ্য",
+        cfgDailyGoalLabel: "দৈনিক পড়ার লক্ষ্য (ঘণ্টা)",
+        cfgStartDateLabel: "কাউন্টডাউন শুরুর তারিখ",
+        cfgExamDateLabel: "সম্ভাব্য HSC পরীক্ষার তারিখ",
+        cfgRemainingDaysLabel: "বাকি প্রস্তুতির দিন (আজ থেকে)",
+        cfgSubjectsHeader: "বিষয়সমূহ ও সিলেবাস অধ্যায় সংখ্যা",
+        addSubjectBtn: "নতুন বিষয় যোগ",
+        colSubName: "বিষয়ের নাম",
+        colDoneChap: "সম্পন্ন অধ্যায়",
+        colTotalChap: "মোট অধ্যায়",
+        colAction: "মুছুন",
+        backupSectionTitle: "ডেটা ব্যাকআপ ও রিস্টোর (JSON)",
+        backupSectionSub: "অন্য ডিভাইস বা ব্রাউজারে ডেটা নিতে ব্যাকআপ ফাইল ডাউনলোড বা আপলোড করুন।",
+        exportBtn: "ব্যাকআপ ডাউনলোড",
+        importBtn: "রিস্টোর ফাইল",
+        resetDefaultsBtn: "ডিফল্ট সেটিংসে ফিরে যান",
+        cancelBtn: "বাতিল",
+        saveBtn: "সংরক্ষণ করুন",
+        futureToast: "ভবিষ্যতের দিন এখনো আসেনি! আজকের দিনের ওপর মনোযোগ দাও।",
+        savedToast: "সফলভাবে সংরক্ষণ করা হয়েছে!",
+        todayMarkedToast: "দারুণ! আজকের দিনটি সফলভাবে সম্পন্ন হিসেবে চিহ্নিত হয়েছে।",
+        chapterPlaceholder: "সম্পন্ন অধ্যায় বা টপিক (যেমন: ভেক্টর, জৈব রসায়ন...)",
+        notePlaceholder: "সংক্ষিপ্ত নোট বা গুরুত্বপূর্ণ সূত্র...",
+        todayBadge: "আজকের রেকর্ড",
+        pastBadge: "অতীতের রেকর্ড",
+        journalTodayTitle: "আজকের ডায়েরি",
+        journalTodaySub: "দিন শেষে নিজের সঙ্গে একটু কথা বলো",
+        journalLearned: "আজ কী শিখলাম?",
+        journalUnfinished: "কী শেষ করতে পারিনি?",
+        journalTomorrow: "আগামীকাল কী করব?",
+        journalProductivity: "আজকের উৎপাদনশীলতা",
+        journalPastTitle: "আগের দিনের ডায়েরি",
+        journalPastHint: "তারিখ নির্বাচন করে দেখো।",
+        journalPastIntro: "আগের দিনের এন্ট্রি দেখতে ক্যালেন্ডারের দিনেও ক্লিক করতে পারো।",
+        journalPickTitle: "কোনো দিন নির্বাচন করা হয়নি",
+        journalPickDesc: "একটি অতীতের তারিখ বেছে নিলে সেই দিনের ডায়েরি এখানে দেখা যাবে।",
+        journalEmptyTitle: "এই দিনে কোনো ডায়েরি লেখা হয়নি",
+        journalEmptyDesc: "অন্য একটি তারিখ বেছে নিয়ে দেখতে পারো।",
+        journalPastProductivity: "উৎপাদনশীলতা",
+        journalLegacy: "দিনের সারসংক্ষেপ",
+      },
+      en: {
+        appTitle: "HSC Life Countdown",
+        coreMotto: "“Every day that passes is one less day of my HSC journey.”",
+        settingsBtn: "Settings",
+        liveCountdownLabel: "LIVE HSC EXAM COUNTDOWN",
+        examTargetTitle: "Target: HSC Board Exam",
+        daysUnit: "Days",
+        hoursUnit: "Hours",
+        minsUnit: "Mins",
+        secsUnit: "Secs",
+        totalDaysLabel: "Total Journey Days",
+        passedDaysLabel: "Days Passed",
+        passedSub: "Auto-updated by calendar",
+        remainingDaysLabel: "Days Remaining",
+        remainingSub: "Make every single day count",
+        streakLabel: "Study Streak",
+        lifeGridTitle: "HSC Life Grid (1 Square = 1 Day of Your Journey)",
+        lifeGridSubtitle: "Click any past day or today to inspect or update your daily academic log.",
+        markTodayTodo: "Mark Today as Passed",
+        markTodayDone: "Today Marked Complete ✓",
+        legendPassedEmpty: "Passed (0 hrs)",
+        legendToday: "Today",
+        legendFuture: "Future Day",
+        backToToday: "Back to Today",
+        dailyStudyTotal: "Total Study Time",
+        subjectsDoneLabel: "Subjects Completed",
+        dailyGoalLabel: "Daily Target",
+        editGoalBtn: "Edit",
+        dailyReflectionTitle: "Daily Reflection & Mistake Log",
+        focusTimerTitle: "FOCUS STUDY TIMER",
+        timerHint: "Click 'Log' to add elapsed minutes to the selected subject",
+        logBtn: "Log",
+        resetTimer: "Reset Timer",
+        weeklyChartTitle: "Last 7 Days Consistency",
+        syllabusOverviewTitle: "Syllabus & Total Hours Invested",
+        editChaptersLink: "Update Chapters",
+        settingsModalTitle: "Personal Configuration & Goals",
+        settingsModalSub: "Customize your HSC exam date, goals, and subjects",
+        cfgLevelLabel: "Student Level",
+        cfgAcademicGoalLabel: "Academic Goal",
+        cfgDreamGoalLabel: "Long-term / Admission Goal",
+        cfgDailyGoalLabel: "Daily Study Goal (Hours)",
+        cfgStartDateLabel: "Countdown Start Date",
+        cfgExamDateLabel: "Expected HSC Exam Date",
+        cfgRemainingDaysLabel: "Remaining Days (from Today)",
+        cfgSubjectsHeader: "Subjects & Syllabus Chapter Counts",
+        addSubjectBtn: "Add Subject",
+        colSubName: "Subject Name",
+        colDoneChap: "Completed",
+        colTotalChap: "Total",
+        colAction: "Remove",
+        backupSectionTitle: "Data Backup & Restore (JSON)",
+        backupSectionSub: "Download or upload your backup file to move data across devices or browsers.",
+        exportBtn: "Export Backup",
+        importBtn: "Import File",
+        resetDefaultsBtn: "Reset to Defaults",
+        cancelBtn: "Cancel",
+        saveBtn: "Save Changes",
+        futureToast: "That day hasn't arrived yet! Stay focused on today.",
+        savedToast: "Saved successfully!",
+        todayMarkedToast: "Awesome! Today has been marked as completed.",
+        chapterPlaceholder: "Completed chapters/topics (e.g., Vector, Organic Chem...)",
+        notePlaceholder: "Quick notes or key formulas...",
+        todayBadge: "Today's Record",
+        pastBadge: "Past Record",
+        journalTodayTitle: "Today's Journal",
+        journalTodaySub: "Take a moment to talk with yourself at the end of the day",
+        journalLearned: "What did I learn today?",
+        journalUnfinished: "What couldn't I finish?",
+        journalTomorrow: "What will I do tomorrow?",
+        journalProductivity: "Today's productivity",
+        journalPastTitle: "Previous Journal",
+        journalPastHint: "Pick a date to view.",
+        journalPastIntro: "You can also click a day on the calendar grid to open an earlier entry.",
+        journalPickTitle: "No day selected",
+        journalPickDesc: "Choose a past date and that day's journal will appear here.",
+        journalEmptyTitle: "No journal was written on this day",
+        journalEmptyDesc: "Try picking another date.",
+        journalPastProductivity: "Productivity",
+        journalLegacy: "Day summary",
+      }
+    };
+
+    // =========================================================
+    // 2. DATE HELPERS (LOCAL CALENDAR DATE SAFE)
+    // =========================================================
+    function getLocalTodayStr() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function parseLocalDate(dateStr) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(y, m - 1, d, 0, 0, 0, 0);
+    }
+
+    function formatDateStr(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function addDaysToDateStr(dateStr, days) {
+      const dt = parseLocalDate(dateStr);
+      dt.setDate(dt.getDate() + days);
+      return formatDateStr(dt);
+    }
+
+    function diffDays(startStr, endStr) {
+      const s = parseLocalDate(startStr);
+      const e = parseLocalDate(endStr);
+      return Math.round((e - s) / (1000 * 60 * 60 * 24));
+    }
+
+    const BN_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    function toLocalizedNum(num) {
+      if (state.lang === 'en') return String(num);
+      return String(num).replace(/\d/g, d => BN_DIGITS[d]);
+    }
+
+    function formatReadableDate(dateStr) {
+      const dt = parseLocalDate(dateStr);
+      if (state.lang === 'bn') {
+        const monthsBn = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+        const daysBn = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+        return `${toLocalizedNum(dt.getDate())} ${monthsBn[dt.getMonth()]}, ${toLocalizedNum(dt.getFullYear())} (${daysBn[dt.getDay()]})`;
+      } else {
+        return dt.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+      }
+    }
+
+    function formatShortDate(dateStr) {
+      const dt = parseLocalDate(dateStr);
+      if (state.lang === 'bn') {
+        const monthsBn = ['জানু', 'ফেব্রু', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টে', 'অক্টো', 'নভে', 'ডিসে'];
+        return `${toLocalizedNum(dt.getDate())} ${monthsBn[dt.getMonth()]}`;
+      }
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    // =========================================================
+    // 3. STATE MANAGEMENT & PERSISTENCE
+    // =========================================================
+    const STORAGE_KEY = 'hsc_life_tracker_v1';
+
+    function createDefaultState() {
+      const todayStr = getLocalTodayStr();
+      // Default start 2026-10-26 and target HSC exam date 2028-05-08
+      const defaultStart = '2026-10-26';
+      const defaultExam = '2028-05-08';
+
+      const defaultSubjects = [
+        { id: 'phy', name: 'পদার্থবিজ্ঞান (Physics)', color: 'sky', completedChapters: 3, totalChapters: 21 },
+        { id: 'chem', name: 'রসায়ন (Chemistry)', color: 'purple', completedChapters: 2, totalChapters: 10 },
+        { id: 'math', name: 'উচ্চতর গণিত (Higher Math)', color: 'emerald', completedChapters: 4, totalChapters: 20 },
+        { id: 'bio', name: 'জীববিজ্ঞান (Biology)', color: 'rose', completedChapters: 3, totalChapters: 24 },
+        { id: 'eng', name: 'ইংরেজি (English)', color: 'amber', completedChapters: 4, totalChapters: 15 },
+        { id: 'ict', name: 'আইসিটি (ICT)', color: 'cyan', completedChapters: 2, totalChapters: 6 },
+        { id: 'ban', name: 'বাংলা (Bangla)', color: 'orange', completedChapters: 5, totalChapters: 24 },
+      ];
+
+      // Seed a few realistic past study days so the grid and weekly chart come alive on first visit
+      const logs = {};
+      const sampleDays = [
+        { offset: -6, marked: true, subs: { math: { done: true, mins: 120, ch: 'ভেক্টর অনুশীলনী', note: 'ডট ও ক্রস গুণন শেষ' }, phy: { done: true, mins: 90, ch: 'গতিবিদ্যা', note: 'প্রাসের গাণিতিক সমস্যা' } } },
+        { offset: -5, marked: true, subs: { chem: { done: true, mins: 135, ch: 'গুণগত রসায়ন', note: 'কোয়ান্টাম সংখ্যা' }, ict: { done: true, mins: 60, ch: 'সংখ্যা পদ্ধতি', note: 'বাইনারি রূপান্তর' } } },
+        { offset: -4, marked: false, subs: { bio: { done: true, mins: 90, ch: 'কোষ ও এর গঠন', note: 'মাইটোকন্ড্রিয়া চিত্র' } } },
+        { offset: -3, marked: true, subs: { math: { done: true, mins: 150, ch: 'সরলরেখা', note: 'ঢাল ও সমীকরণ' }, phy: { done: true, mins: 120, ch: 'নিউটনিয়ান বলবিদ্যা', note: 'কৌণিক ভরবেগ' }, eng: { done: true, mins: 60, ch: 'Modifiers', note: 'Board questions' } } },
+        { offset: -2, marked: true, subs: { chem: { done: true, mins: 110, ch: 'মৌলের পর্যায়বৃত্ত ধর্ম', note: 'আয়নিকরণ শক্তি' }, ban: { done: true, mins: 60, ch: 'অপরিচিতা', note: 'সৃজনশীল প্রশ্ন' } } },
+        { offset: -1, marked: true, subs: { phy: { done: true, mins: 140, ch: 'কাজ, শক্তি ও ক্ষমতা', note: 'কর্মদক্ষতা ম্যাথ' }, math: { done: true, mins: 130, ch: 'ত্রিকোণমিতি', note: 'সূত্র রিভিশন' }, bio: { done: true, mins: 80, ch: 'কোষ বিভাজন', note: 'মাইটোসিস ধাপসমূহ' } } },
+      ];
+
+      sampleDays.forEach(s => {
+        const dStr = addDaysToDateStr(todayStr, s.offset);
+        logs[dStr] = {
+          markedComplete: s.marked,
+          reflection: '',
+          subjects: s.subs
+        };
+      });
+
+      return {
+        lang: 'bn',
+        theme: 'dark',
+        config: {
+          level: 'HSC প্রথম বর্ষ',
+          academicGoal: 'HSC GPA 5.00',
+          dreamGoal: 'বুয়েট (BUET) অথবা সরকারি মেডিকেল কলেজ',
+          dailyGoalHours: 5,
+          startDate: defaultStart,
+          examDate: defaultExam,
+          subjects: defaultSubjects
+        },
+        selectedDate: todayStr,
+        logs
+      };
+    }
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          // Always default selectedDate to current real Today when opening fresh
+          parsed.selectedDate = getLocalTodayStr();
+          if (!parsed.config.dailyGoalHours) {
+            parsed.config.dailyGoalHours = 5;
+          }
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Failed to load state:', e);
+      }
+      return createDefaultState();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Failed to save state:', e);
+      }
+    }
+
+    // =========================================================
+    // 4. CORE RENDERING & AUTO-CALENDAR ENGINE
+    // =========================================================
+    function initApp() {
+      applyTheme();
+      applyLanguage();
+      renderAll();
+      startLiveCountdown();
+      lucide.createIcons();
+    }
+
+    function renderAll() {
+      renderHeaderGoals();
+      renderMetricsAndProgress();
+      renderLifeGrid();
+      renderDailyTracker();
+      renderJournal();
+      renderTimerSubjects();
+      renderWeeklyChart();
+      renderSyllabusOverview();
+      renderOverview();
+      lucide.createIcons();
+    }
+
+    function renderHeaderGoals() {
+      document.getElementById('header-level-badge').textContent = state.config.level;
+      document.getElementById('header-academic-goal').textContent = state.config.academicGoal;
+      document.getElementById('header-dream-goal').textContent = state.config.dreamGoal;
+      document.getElementById('mobile-academic-goal').textContent = state.config.academicGoal;
+      document.getElementById('mobile-dream-goal').textContent = state.config.dreamGoal;
+    }
+
+    function renderMetricsAndProgress() {
+      const todayStr = getLocalTodayStr();
+      const { startDate, examDate } = state.config;
+
+      const totalDays = Math.max(1, diffDays(startDate, examDate));
+      const rawPassed = diffDays(startDate, todayStr);
+      const passedDays = Math.min(totalDays, Math.max(0, rawPassed));
+      const remainingDays = Math.max(0, diffDays(todayStr, examDate));
+
+      const elapsedPct = Math.min(100, Math.max(0, ((passedDays / totalDays) * 100))).toFixed(1);
+      const remainingPct = Math.max(0, (100 - parseFloat(elapsedPct))).toFixed(1);
+
+      document.getElementById('display-exam-date').textContent = formatReadableDate(examDate);
+      document.getElementById('journey-range-subtitle').textContent =
+        state.lang === 'bn'
+          ? `প্রস্তুতি শুরু: ${formatReadableDate(startDate)} → পরীক্ষা: ${formatReadableDate(examDate)}`
+          : `Started: ${formatReadableDate(startDate)} → Exam: ${formatReadableDate(examDate)}`;
+
+      document.getElementById('stat-total-days').textContent = toLocalizedNum(totalDays);
+      const approxMonths = (remainingDays / 30).toFixed(1);
+      document.getElementById('stat-months-approx').textContent =
+        state.lang === 'bn' ? `বাকি ~${toLocalizedNum(approxMonths)} মাস` : `~${approxMonths} months left`;
+
+      document.getElementById('stat-passed-days').textContent = toLocalizedNum(passedDays);
+      document.getElementById('stat-passed-pct').textContent = `${toLocalizedNum(elapsedPct)}%`;
+
+      document.getElementById('stat-remaining-days').textContent = toLocalizedNum(remainingDays);
+      document.getElementById('stat-remaining-pct').textContent = `${toLocalizedNum(remainingPct)}%`;
+
+      document.getElementById('bar-elapsed-text').textContent =
+        state.lang === 'bn' ? `সময় অতিবাহিত: ${toLocalizedNum(elapsedPct)}%` : `Time Elapsed: ${elapsedPct}%`;
+      document.getElementById('bar-remaining-text').textContent =
+        state.lang === 'bn' ? `বাকি সময়: ${toLocalizedNum(remainingPct)}%` : `Time Remaining: ${remainingPct}%`;
+      document.getElementById('journey-progress-fill').style.width = `${elapsedPct}%`;
+
+      // Calculate streak and total hours logged across journey
+      const streak = calculateStudyStreak();
+      document.getElementById('stat-streak').textContent = toLocalizedNum(streak);
+
+      let totalMinsAllTime = 0;
+      Object.values(state.logs).forEach(dayLog => {
+        if (dayLog && dayLog.subjects) {
+          Object.values(dayLog.subjects).forEach(sub => {
+            totalMinsAllTime += (Number(sub.mins) || 0);
+          });
+        }
+      });
+      const totalHrsAllTime = (totalMinsAllTime / 60).toFixed(1);
+      document.getElementById('stat-total-logged-hours').textContent =
+        state.lang === 'bn' ? `মোট পড়া: ${toLocalizedNum(totalHrsAllTime)} ঘণ্টা` : `Total Studied: ${totalHrsAllTime} hrs`;
+    }
+
+    function getDayTotalMinutes(dateStr) {
+      const log = state.logs[dateStr];
+      if (!log || !log.subjects) return 0;
+      return Object.values(log.subjects).reduce((acc, s) => acc + (Number(s.mins) || 0), 0);
+    }
+
+    function getDayCompletedSubjectsCount(dateStr) {
+      const log = state.logs[dateStr];
+      if (!log || !log.subjects) return 0;
+      return Object.values(log.subjects).filter(s => s.done).length;
+    }
+
+    function calculateStudyStreak() {
+      const todayStr = getLocalTodayStr();
+      let streak = 0;
+      // Check today first; if today has study or markedComplete, count it, otherwise start checking from yesterday
+      let cursor = todayStr;
+      if (getDayTotalMinutes(cursor) === 0 && !(state.logs[cursor]?.markedComplete)) {
+        cursor = addDaysToDateStr(todayStr, -1);
+      }
+      while (true) {
+        const mins = getDayTotalMinutes(cursor);
+        const marked = state.logs[cursor]?.markedComplete;
+        if (mins > 0 || marked) {
+          streak++;
+          cursor = addDaysToDateStr(cursor, -1);
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    // =========================================================
+    // 5. GITHUB-STYLE HSC LIFE GRID
+    // =========================================================
+    function renderLifeGrid() {
+      const gridEl = document.getElementById('life-grid');
+      gridEl.innerHTML = '';
+
+      const todayStr = getLocalTodayStr();
+      const { startDate, examDate } = state.config;
+      const totalDays = Math.min(1600, Math.max(1, diffDays(startDate, examDate)));
+
+      let activeLoggedDays = 0;
+
+      for (let i = 0; i <= totalDays; i++) {
+        const cellDateStr = addDaysToDateStr(startDate, i);
+        const isToday = cellDateStr === todayStr;
+        const isPast = cellDateStr < todayStr;
+        const isFuture = cellDateStr > todayStr;
+        const isSelected = cellDateStr === state.selectedDate;
+
+        const mins = getDayTotalMinutes(cellDateStr);
+        const hrs = mins / 60;
+        const isMarked = Boolean(state.logs[cellDateStr]?.markedComplete);
+
+        if ((isPast || isToday) && (mins > 0 || isMarked)) {
+          activeLoggedDays++;
+        }
+
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'life-cell w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[4px] relative focus:outline-none cursor-pointer ';
+
+        if (isFuture) {
+          cell.className += 'border border-dashed border-slate-300 dark:border-slate-700/80 bg-transparent opacity-55 hover:opacity-90';
+        } else if (isToday) {
+          cell.className += 'today-cell ';
+          if (isMarked || hrs >= 7) {
+            cell.className += 'bg-emerald-400 ring-2 ring-amber-400';
+          } else if (hrs > 0) {
+            cell.className += 'bg-emerald-500 ring-2 ring-amber-400';
+          } else {
+            cell.className += 'bg-amber-400 ring-2 ring-amber-400/60';
+          }
+        } else {
+          // Passed day automatically filled based on calendar date
+          if (hrs >= 7 || (isMarked && hrs >= 4)) {
+            cell.className += 'bg-emerald-500 dark:bg-emerald-400 shadow-sm shadow-emerald-500/30';
+          } else if (hrs >= 4) {
+            cell.className += 'bg-emerald-400 dark:bg-emerald-500';
+          } else if (hrs > 0 || isMarked) {
+            cell.className += 'bg-emerald-300 dark:bg-emerald-800 border border-emerald-500/40';
+          } else {
+            // Automatically marked passed (calendar passed), 0 hours logged
+            cell.className += 'bg-slate-300/80 dark:bg-slate-700/75';
+          }
+        }
+
+        if (isSelected && !isFuture) {
+          cell.className += ' ring-2 ring-indigo-500 dark:ring-white scale-110 z-10';
+        }
+
+        // Hover Tooltip Events
+        cell.addEventListener('mouseenter', (e) => showGridTooltip(e, cellDateStr, i + 1, totalDays + 1, isToday, isFuture, hrs, isMarked));
+        cell.addEventListener('mousemove', moveGridTooltip);
+        cell.addEventListener('mouseleave', hideGridTooltip);
+
+        // Click Interaction
+        cell.addEventListener('click', () => {
+          if (isFuture) {
+            showToast(I18N[state.lang].futureToast, 'warning');
+            return;
+          }
+          state.selectedDate = cellDateStr;
+          saveState();
+          renderLifeGrid();
+          renderDailyTracker();
+        });
+
+        gridEl.appendChild(cell);
+      }
+
+      // Update Mark Today Button State
+      const todayMarked = Boolean(state.logs[todayStr]?.markedComplete);
+      const markBtn = document.getElementById('mark-today-btn');
+      const markBtnText = document.getElementById('mark-today-btn-text');
+      if (todayMarked) {
+        markBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 cursor-pointer bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40';
+        markBtnText.textContent = I18N[state.lang].markTodayDone;
+      } else {
+        markBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 cursor-pointer bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20';
+        markBtnText.textContent = I18N[state.lang].markTodayTodo;
+      }
+
+      document.getElementById('grid-summary-caption').textContent =
+        state.lang === 'bn'
+          ? `সক্রিয় পড়াশোনার দিন: ${toLocalizedNum(activeLoggedDays)} দিন`
+          : `Active Study Days: ${activeLoggedDays}`;
+    }
+
+    function toggleTodayPassed() {
+      const todayStr = getLocalTodayStr();
+      if (!state.logs[todayStr]) {
+        state.logs[todayStr] = { markedComplete: false, reflection: '', subjects: {} };
+      }
+      state.logs[todayStr].markedComplete = !state.logs[todayStr].markedComplete;
+      state.selectedDate = todayStr;
+      saveState();
+      renderAll();
+      if (state.logs[todayStr].markedComplete) {
+        showToast(I18N[state.lang].todayMarkedToast, 'success');
+      }
+    }
+
+    function showGridTooltip(e, dateStr, dayIndex, totalDays, isToday, isFuture, hrs, isMarked) {
+      const tooltip = document.getElementById('grid-tooltip');
+      document.getElementById('tooltip-date').textContent = formatReadableDate(dateStr);
+      document.getElementById('tooltip-daynum').textContent =
+        state.lang === 'bn'
+          ? `যাত্রার ${toLocalizedNum(dayIndex)}তম দিন (মোট ${toLocalizedNum(totalDays)})`
+          : `Day ${dayIndex} of ${totalDays}`;
+
+      if (isFuture) {
+        document.getElementById('tooltip-stats').textContent = state.lang === 'bn' ? 'অনাগত ভবিষ্যৎ দিন' : 'Upcoming future day';
+        document.getElementById('tooltip-hint').textContent = state.lang === 'bn' ? 'ভবিষ্যতের দিন চিহ্নিত করা যাবে না' : 'Cannot mark future days';
+      } else {
+        const hrsText = state.lang === 'bn' ? `পড়া হয়েছে: ${toLocalizedNum(hrs.toFixed(1))} ঘণ্টা` : `Studied: ${hrs.toFixed(1)} hrs`;
+        const statusText = isMarked ? (state.lang === 'bn' ? '• সম্পন্ন ✓' : '• Completed ✓') : '';
+        document.getElementById('tooltip-stats').textContent = `${hrsText} ${statusText}`;
+        document.getElementById('tooltip-hint').textContent = isToday
+          ? (state.lang === 'bn' ? 'আজকের দিন — ক্লিক করে রেকর্ড দেখুন' : 'Today — Click to view/edit log')
+          : (state.lang === 'bn' ? 'ক্লিক করে এই দিনের রেকর্ড দেখুন' : 'Click to inspect this day');
+      }
+
+      tooltip.classList.remove('hidden');
+      moveGridTooltip(e);
+    }
+
+    function moveGridTooltip(e) {
+      const tooltip = document.getElementById('grid-tooltip');
+      const x = Math.min(window.innerWidth - 230, e.clientX + 14);
+      const y = Math.max(12, e.clientY - 75);
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+    }
+
+    function hideGridTooltip() {
+      document.getElementById('grid-tooltip').classList.add('hidden');
+    }
+
+    // =========================================================
+    // 6. DAILY ACADEMIC TRACKER
+    // =========================================================
+    function ensureDayLog(dateStr) {
+      if (!state.logs[dateStr]) {
+        state.logs[dateStr] = {
+          markedComplete: false,
+          reflection: '',
+          subjects: {}
+        };
+      }
+      return state.logs[dateStr];
+    }
+
+    function renderDailyTracker() {
+      const todayStr = getLocalTodayStr();
+      const selStr = state.selectedDate;
+      const isToday = selStr === todayStr;
+
+      // Update Header Badges & Date
+      const badgeEl = document.getElementById('selected-day-badge');
+      badgeEl.textContent = isToday ? I18N[state.lang].todayBadge : I18N[state.lang].pastBadge;
+      badgeEl.className = isToday
+        ? 'text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30'
+        : 'text-xs font-bold px-2.5 py-1 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30';
+
+      const dayNum = diffDays(state.config.startDate, selStr) + 1;
+      document.getElementById('selected-day-number').textContent =
+        dayNum > 0
+          ? (state.lang === 'bn' ? `HSC যাত্রার ${toLocalizedNum(dayNum)}তম দিন` : `Journey Day #${dayNum}`)
+          : '';
+
+      document.getElementById('selected-date-heading').textContent = formatReadableDate(selStr);
+
+      // Show/Hide Back to Today Button & Disable Next Button if Today
+      const backBtn = document.getElementById('back-to-today-btn');
+      if (!isToday) {
+        backBtn.classList.remove('hidden');
+        backBtn.classList.add('flex');
+      } else {
+        backBtn.classList.add('hidden');
+        backBtn.classList.remove('flex');
+      }
+
+      const nextBtn = document.getElementById('next-day-btn');
+      if (selStr >= todayStr) {
+        nextBtn.disabled = true;
+        nextBtn.classList.add('opacity-40', 'cursor-not-allowed');
+      } else {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+      }
+
+      // Summary Strip Calculations
+      const totalMins = getDayTotalMinutes(selStr);
+      const hrs = Math.floor(totalMins / 60);
+      const remMins = totalMins % 60;
+      document.getElementById('daily-total-hours-display').textContent =
+        state.lang === 'bn'
+          ? `${toLocalizedNum(hrs)} ঘণ্টা ${toLocalizedNum(remMins)} মিনিট`
+          : `${hrs}h ${remMins}m`;
+
+      const doneCount = getDayCompletedSubjectsCount(selStr);
+      const totalSubs = state.config.subjects.length;
+      document.getElementById('daily-subjects-count').textContent =
+        `${toLocalizedNum(doneCount)} / ${toLocalizedNum(totalSubs)}`;
+
+      const goalHours = Math.max(0.5, Number(state.config.dailyGoalHours) || 5);
+      const goalMins = goalHours * 60;
+      const goalLabelEl = document.getElementById('daily-goal-label-text');
+      if (goalLabelEl) {
+        goalLabelEl.textContent =
+          state.lang === 'bn'
+            ? `দৈনিক লক্ষ্য (${toLocalizedNum(goalHours)} ঘণ্টা)`
+            : `Daily Target (${goalHours} hrs)`;
+      }
+      const quickGoalInput = document.getElementById('quick-goal-input');
+      if (quickGoalInput) {
+        quickGoalInput.value = goalHours;
+      }
+
+      const goalPct = Math.min(100, Math.round((totalMins / goalMins) * 100));
+      document.getElementById('daily-goal-pct').textContent = `${toLocalizedNum(goalPct)}%`;
+      document.getElementById('daily-goal-bar').style.width = `${goalPct}%`;
+
+      // Render Subject Cards
+      const container = document.getElementById('subject-checklist-container');
+      container.innerHTML = '';
+      const dayLog = ensureDayLog(selStr);
+
+      state.config.subjects.forEach(sub => {
+        const entry = dayLog.subjects[sub.id] || { done: false, mins: 0, ch: '', note: '' };
+        const subHrs = Math.floor((entry.mins || 0) / 60);
+        const subMins = (entry.mins || 0) % 60;
+
+        const card = document.createElement('div');
+        card.className = `rounded-2xl p-4 border transition-all ${
+          entry.done
+            ? 'bg-emerald-500/[0.06] dark:bg-emerald-500/[0.07] border-emerald-500/35'
+            : 'bg-slate-50/80 dark:bg-slateDark-850/70 border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <!-- Checkbox & Subject Name -->
+            <label class="flex items-center gap-3 cursor-pointer select-none">
+              <input type="checkbox" ${entry.done ? 'checked' : ''} onchange="toggleSubjectDone('${sub.id}', this.checked)"
+                class="w-5 h-5 rounded-lg accent-emerald-500 cursor-pointer shrink-0" />
+              <div>
+                <span class="font-bold text-sm sm:text-base ${entry.done ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-100'}">
+                  ${sub.name}
+                </span>
+                <span class="ml-2 text-xs font-mono px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-slateDark-800 text-slate-600 dark:text-slate-300">
+                  ${toLocalizedNum(subHrs)}h ${toLocalizedNum(subMins)}m
+                </span>
+              </div>
+            </label>
+
+            <!-- Quick Duration Controls -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" onclick="adjustSubjectMinutes('${sub.id}', -30)" class="px-2 py-1 rounded-lg text-xs font-semibold bg-slate-200/80 hover:bg-slate-300 dark:bg-slateDark-800 dark:hover:bg-slateDark-700 text-slate-700 dark:text-slate-300 cursor-pointer">
+                -30m
+              </button>
+              <button type="button" onclick="adjustSubjectMinutes('${sub.id}', 30)" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 cursor-pointer">
+                +30m
+              </button>
+              <button type="button" onclick="adjustSubjectMinutes('${sub.id}', 60)" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 cursor-pointer">
+                +1h
+              </button>
+              <div class="flex items-center gap-1 ml-1 bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5">
+                <input type="number" min="0" max="1440" value="${entry.mins || 0}" onchange="setSubjectMinutes('${sub.id}', this.value)"
+                  class="w-12 text-xs font-mono text-center bg-transparent focus:outline-none text-slate-800 dark:text-slate-100" title="Total minutes" />
+                <span class="text-[10px] text-slate-400">min</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chapter & Notes Inputs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3 pt-3 border-t border-slate-200/60 dark:border-slate-800/80">
+            <div class="relative">
+              <input type="text" value="${escapeHtml(entry.ch || '')}" onchange="updateSubjectField('${sub.id}', 'ch', this.value)"
+                placeholder="${I18N[state.lang].chapterPlaceholder}"
+                class="w-full rounded-xl bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700/80 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+            </div>
+            <div class="relative">
+              <input type="text" value="${escapeHtml(entry.note || '')}" onchange="updateSubjectField('${sub.id}', 'note', this.value)"
+                placeholder="${I18N[state.lang].notePlaceholder}"
+                class="w-full rounded-xl bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700/80 px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Daily Journal: the "previous days" card follows the selected date
+      renderJournalPast();
+    }
+
+    function toggleSubjectDone(subId, isDone) {
+      const dayLog = ensureDayLog(state.selectedDate);
+      if (!dayLog.subjects[subId]) dayLog.subjects[subId] = { done: false, mins: 0, ch: '', note: '' };
+      dayLog.subjects[subId].done = isDone;
+      // If user checks done and minutes are 0, give a helpful 60m default that they can adjust
+      if (isDone && (!dayLog.subjects[subId].mins || dayLog.subjects[subId].mins === 0)) {
+        dayLog.subjects[subId].mins = 60;
+      }
+      saveState();
+      renderAll();
+    }
+
+    function adjustSubjectMinutes(subId, delta) {
+      const dayLog = ensureDayLog(state.selectedDate);
+      if (!dayLog.subjects[subId]) dayLog.subjects[subId] = { done: false, mins: 0, ch: '', note: '' };
+      const nextMins = Math.max(0, (Number(dayLog.subjects[subId].mins) || 0) + delta);
+      dayLog.subjects[subId].mins = nextMins;
+      if (nextMins > 0) dayLog.subjects[subId].done = true;
+      saveState();
+      renderAll();
+    }
+
+    function setSubjectMinutes(subId, val) {
+      const dayLog = ensureDayLog(state.selectedDate);
+      if (!dayLog.subjects[subId]) dayLog.subjects[subId] = { done: false, mins: 0, ch: '', note: '' };
+      const parsed = Math.max(0, Math.min(1440, parseInt(val, 10) || 0));
+      dayLog.subjects[subId].mins = parsed;
+      if (parsed > 0) dayLog.subjects[subId].done = true;
+      saveState();
+      renderAll();
+    }
+
+    function updateSubjectField(subId, field, value) {
+      const dayLog = ensureDayLog(state.selectedDate);
+      if (!dayLog.subjects[subId]) dayLog.subjects[subId] = { done: false, mins: 0, ch: '', note: '' };
+      dayLog.subjects[subId][field] = value;
+      saveState();
+    }
+
+    function updateDailyReflection(val) {
+      const dayLog = ensureDayLog(state.selectedDate);
+      dayLog.reflection = val;
+      saveState();
+    }
+
+    // =========================================================
+    // 6b. DAILY JOURNAL
+    // Stored per date at state.logs[date].journal =
+    //   { learned, unfinished, tomorrow, productivity (1-5) }
+    // The legacy state.logs[date].reflection string is left untouched.
+    // =========================================================
+    const JOURNAL_FIELDS = ['learned', 'unfinished', 'tomorrow'];
+    let journalFormDate = null;
+
+    function getJournal(dateStr) {
+      const log = state.logs && state.logs[dateStr];
+      return log && log.journal && typeof log.journal === 'object' ? log.journal : null;
+    }
+
+    function journalHasContent(j) {
+      if (!j) return false;
+      const hasText = JOURNAL_FIELDS.some(k => String(j[k] || '').trim() !== '');
+      return hasText || typeof j.productivity === 'number';
+    }
+
+    function clampRating(v) {
+      const n = Math.round(Number(v));
+      return Math.min(5, Math.max(1, Number.isFinite(n) ? n : 3));
+    }
+
+    function updateProductivityLabel() {
+      const slider = document.getElementById('journal-productivity');
+      document.getElementById('journal-prod-label').textContent =
+        `${I18N[state.lang].journalProductivity}: ${toLocalizedNum(slider.value)}/${toLocalizedNum(5)}`;
+    }
+
+    // Left card: today's form (always bound to the real current date)
+    function renderJournal() {
+      const todayStr = getLocalTodayStr();
+      journalFormDate = todayStr;
+      document.getElementById('journal-today-date').textContent = formatReadableDate(todayStr);
+
+      const j = getJournal(todayStr) || {};
+      JOURNAL_FIELDS.forEach(k => {
+        const el = document.getElementById('journal-' + k);
+        const v = typeof j[k] === 'string' ? j[k] : '';
+        if (el.value !== v) el.value = v;
+      });
+
+      const slider = document.getElementById('journal-productivity');
+      const hasRating = typeof j.productivity === 'number';
+      slider.value = hasRating ? clampRating(j.productivity) : 3;
+      slider.dataset.touched = hasRating ? '1' : '0';
+      updateProductivityLabel();
+    }
+
+    function onJournalSlider() {
+      updateProductivityLabel();
+      saveTodayJournal(true);
+    }
+
+    // Auto-save on every keystroke / slider move
+    function saveTodayJournal(fromSlider) {
+      const dateStr = journalFormDate || getLocalTodayStr();
+      const slider = document.getElementById('journal-productivity');
+      if (fromSlider) slider.dataset.touched = '1';
+
+      const data = {};
+      JOURNAL_FIELDS.forEach(k => { data[k] = document.getElementById('journal-' + k).value; });
+      const hasText = JOURNAL_FIELDS.some(k => data[k].trim() !== '');
+      const touched = slider.dataset.touched === '1';
+
+      const dayLog = ensureDayLog(dateStr);
+      if (!hasText && !touched) {
+        delete dayLog.journal; // nothing written -> no empty/dummy entry
+      } else {
+        dayLog.journal = { ...data, productivity: clampRating(slider.value) };
+      }
+      saveState();
+    }
+
+    // Right card: read-only viewer for the selected past date
+    function renderJournalPast() {
+      const body = document.getElementById('journal-past-body');
+      const picker = document.getElementById('journal-date-picker');
+      if (!body || !picker) return;
+
+      const t = I18N[state.lang];
+      const todayStr = getLocalTodayStr();
+      const sel = state.selectedDate;
+
+      picker.max = addDaysToDateStr(todayStr, -1);
+      picker.value = sel < todayStr ? sel : '';
+
+      const emptyState = (title, desc) => `
+        <div class="flex-1 flex flex-col items-center justify-center text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-700/80 px-6 py-8">
+          <div class="text-sm font-semibold text-slate-700 dark:text-slate-200">${escapeHtml(title)}</div>
+          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">${escapeHtml(desc)}</div>
+        </div>`;
+
+      // Today's entry is never shown here
+      if (sel >= todayStr) {
+        body.innerHTML = emptyState(t.journalPickTitle, t.journalPickDesc);
+        return;
+      }
+
+      const j = getJournal(sel);
+      const legacy = String((state.logs[sel] && state.logs[sel].reflection) || '').trim();
+      if (!journalHasContent(j) && !legacy) {
+        body.innerHTML = emptyState(t.journalEmptyTitle, t.journalEmptyDesc);
+        return;
+      }
+
+      const block = (label, text) => `
+        <div>
+          <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">${escapeHtml(label)}</div>
+          <div class="rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200 dark:border-slate-700/80 px-4 py-3 text-sm leading-relaxed text-slate-800 dark:text-slate-100 whitespace-pre-wrap break-words">${escapeHtml(text)}</div>
+        </div>`;
+
+      let html = `<div class="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">${escapeHtml(formatReadableDate(sel))}</div><div class="space-y-3.5">`;
+      if (j) {
+        if (String(j.learned || '').trim()) html += block(t.journalLearned, j.learned);
+        if (String(j.unfinished || '').trim()) html += block(t.journalUnfinished, j.unfinished);
+        if (String(j.tomorrow || '').trim()) html += block(t.journalTomorrow, j.tomorrow);
+      }
+      if (legacy) html += block(t.journalLegacy, legacy);
+      if (j && typeof j.productivity === 'number') {
+        html += `<div class="text-sm font-semibold text-slate-700 dark:text-slate-200 pt-1">${escapeHtml(t.journalPastProductivity)}: ${toLocalizedNum(clampRating(j.productivity))}/${toLocalizedNum(5)}</div>`;
+      }
+      html += '</div>';
+      body.innerHTML = html;
+    }
+
+    // Date picker in the right card (same selectedDate the calendar grid uses)
+    function selectJournalDate(val) {
+      if (!val) return;
+      if (val >= getLocalTodayStr()) {
+        showToast(I18N[state.lang].futureToast, 'warning');
+        renderJournalPast();
+        return;
+      }
+      state.selectedDate = val;
+      saveState();
+      renderLifeGrid();
+      renderDailyTracker(); // also refreshes the journal viewer
+    }
+
+    function navigateSelectedDate(offset) {
+      const target = addDaysToDateStr(state.selectedDate, offset);
+      const todayStr = getLocalTodayStr();
+      if (target > todayStr) {
+        showToast(I18N[state.lang].futureToast, 'warning');
+        return;
+      }
+      state.selectedDate = target;
+      saveState();
+      renderLifeGrid();
+      renderDailyTracker();
+    }
+
+    function selectToday() {
+      state.selectedDate = getLocalTodayStr();
+      saveState();
+      renderLifeGrid();
+      renderDailyTracker();
+    }
+
+    function toggleQuickGoalEditor(forceState) {
+      const editor = document.getElementById('quick-goal-editor');
+      if (!editor) return;
+      const shouldShow = typeof forceState === 'boolean' ? forceState : editor.classList.contains('hidden');
+      if (shouldShow) {
+        editor.classList.remove('hidden');
+        editor.classList.add('flex');
+        const inp = document.getElementById('quick-goal-input');
+        if (inp) {
+          inp.value = state.config.dailyGoalHours || 5;
+          inp.focus();
+        }
+      } else {
+        editor.classList.add('hidden');
+        editor.classList.remove('flex');
+      }
+    }
+
+    function adjustDailyGoalHours(delta) {
+      const current = Number(state.config.dailyGoalHours) || 5;
+      setDailyGoalHours(current + delta);
+    }
+
+    function setDailyGoalHours(val) {
+      const parsed = Math.min(16, Math.max(1, Math.round((parseFloat(val) || 5) * 2) / 2));
+      state.config.dailyGoalHours = parsed;
+      saveState();
+      renderDailyTracker();
+      renderWeeklyChart();
+      showToast(
+        state.lang === 'bn'
+          ? `দৈনিক লক্ষ্য ${toLocalizedNum(parsed)} ঘণ্টায় সেট করা হয়েছে!`
+          : `Daily study goal updated to ${parsed} hrs!`,
+        'success'
+      );
+    }
+
+    // =========================================================
+    // 7. LIVE COUNTDOWN & FOCUS STUDY STOPWATCH
+    // =========================================================
+    let countdownInterval = null;
+    let lastCheckedDateStr = getLocalTodayStr();
+
+    function startLiveCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      updateCountdownTick();
+      countdownInterval = setInterval(updateCountdownTick, 1000);
+    }
+
+    function updateCountdownTick() {
+      const currentTodayStr = getLocalTodayStr();
+      if (currentTodayStr !== lastCheckedDateStr) {
+        lastCheckedDateStr = currentTodayStr;
+        state.selectedDate = currentTodayStr;
+        renderAll();
+      }
+
+      const now = new Date();
+      const target = parseLocalDate(state.config.examDate);
+      const diffMs = Math.max(0, target - now);
+
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diffMs / (1000 * 60)) % 60);
+      const secs = Math.floor((diffMs / 1000) % 60);
+
+      const dEl = document.getElementById('cd-days');
+      const hEl = document.getElementById('cd-hours');
+      const mEl = document.getElementById('cd-mins');
+      const sEl = document.getElementById('cd-secs');
+      if (dEl) dEl.textContent = toLocalizedNum(String(days).padStart(3, '0'));
+      if (hEl) hEl.textContent = toLocalizedNum(String(hours).padStart(2, '0'));
+      if (mEl) mEl.textContent = toLocalizedNum(String(mins).padStart(2, '0'));
+      if (sEl) sEl.textContent = toLocalizedNum(String(secs).padStart(2, '0'));
+    }
+
+    let swSeconds = 0;
+    let swInterval = null;
+    let swRunning = false;
+
+    function renderTimerSubjects() {
+      const select = document.getElementById('timer-subject-select');
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      state.config.subjects.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub.id;
+        opt.textContent = sub.name;
+        opt.className = 'bg-slate-900 text-white';
+        select.appendChild(opt);
+      });
+      if (prev && state.config.subjects.some(s => s.id === prev)) {
+        select.value = prev;
+      }
+    }
+
+    function toggleStopwatch() {
+      const btnLabel = document.getElementById('timer-start-label');
+      const statusPill = document.getElementById('timer-status-pill');
+      if (swRunning) {
+        clearInterval(swInterval);
+        swRunning = false;
+        if (btnLabel) btnLabel.textContent = state.lang === 'bn' ? 'চালু করুন' : 'Resume';
+        if (statusPill) statusPill.textContent = state.lang === 'bn' ? 'বিরতি' : 'Paused';
+      } else {
+        swRunning = true;
+        if (btnLabel) btnLabel.textContent = state.lang === 'bn' ? 'বিরতি' : 'Pause';
+        if (statusPill) statusPill.textContent = state.lang === 'bn' ? 'চলছে...' : 'Running';
+        swInterval = setInterval(() => {
+          swSeconds++;
+          updateStopwatchDisplay();
+        }, 1000);
+      }
+    }
+
+    function updateStopwatchDisplay() {
+      const h = String(Math.floor(swSeconds / 3600)).padStart(2, '0');
+      const m = String(Math.floor((swSeconds % 3600) / 60)).padStart(2, '0');
+      const s = String(swSeconds % 60).padStart(2, '0');
+      const disp = document.getElementById('stopwatch-display');
+      if (disp) disp.textContent = `${h}:${m}:${s}`;
+    }
+
+    function saveStopwatchToSubject() {
+      const minsLogged = Math.max(1, Math.round(swSeconds / 60));
+      if (swSeconds < 10) {
+        showToast(
+          state.lang === 'bn' ? 'অন্তত ১০ সেকেন্ড টাইমার চালান!' : 'Run timer for at least 10 seconds!',
+          'warning'
+        );
+        return;
+      }
+      const subId = document.getElementById('timer-subject-select').value;
+      adjustSubjectMinutes(subId, minsLogged);
+      resetStopwatch();
+      showToast(
+        state.lang === 'bn'
+          ? `${toLocalizedNum(minsLogged)} মিনিট পড়াশোনার রেকর্ডে যুক্ত হয়েছে!`
+          : `Added ${minsLogged} mins to study log!`,
+        'success'
+      );
+    }
+
+    function resetStopwatch() {
+      clearInterval(swInterval);
+      swRunning = false;
+      swSeconds = 0;
+      updateStopwatchDisplay();
+      const btnLabel = document.getElementById('timer-start-label');
+      const statusPill = document.getElementById('timer-status-pill');
+      if (btnLabel) btnLabel.textContent = state.lang === 'bn' ? 'শুরু করুন' : 'Start';
+      if (statusPill) statusPill.textContent = state.lang === 'bn' ? 'প্রস্তুত' : 'Ready';
+    }
+
+    // =========================================================
+    // 8. WEEKLY CONSISTENCY CHART & SYLLABUS OVERVIEW
+    // =========================================================
+    function renderWeeklyChart() {
+      const container = document.getElementById('weekly-bars-container');
+      container.innerHTML = '';
+      const todayStr = getLocalTodayStr();
+
+      let totalMins7Days = 0;
+      const daysData = [];
+      for (let i = 6; i >= 0; i--) {
+        const dStr = addDaysToDateStr(todayStr, -i);
+        const mins = getDayTotalMinutes(dStr);
+        totalMins7Days += mins;
+        daysData.push({ dStr, mins, hrs: (mins / 60).toFixed(1), isToday: i === 0 });
+      }
+      const goalTargetMins = Math.max(60, (Number(state.config.dailyGoalHours) || 5) * 60);
+      const maxMins = Math.max(goalTargetMins, ...daysData.map(d => d.mins));
+      const avgHrs = (totalMins7Days / 7 / 60).toFixed(1);
+      document.getElementById('weekly-avg-label').textContent =
+        state.lang === 'bn' ? `গড়: ${toLocalizedNum(avgHrs)} ঘণ্টা/দিন` : `Avg: ${avgHrs} hrs/day`;
+
+      daysData.forEach(d => {
+        const heightPct = Math.max(6, Math.round((d.mins / maxMins) * 100));
+        const col = document.createElement('div');
+        col.className = 'flex flex-col items-center h-full justify-end gap-1.5 group cursor-pointer';
+        col.onclick = () => {
+          state.selectedDate = d.dStr;
+          saveState();
+          renderLifeGrid();
+          renderDailyTracker();
+        };
+
+        col.innerHTML = `
+          <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 opacity-80 group-hover:opacity-100">
+            ${toLocalizedNum(d.hrs)}h
+          </span>
+          <div class="w-full max-w-[26px] bg-slate-100 dark:bg-slateDark-800 rounded-lg h-24 flex items-end overflow-hidden p-0.5">
+            <div class="w-full rounded-md transition-all duration-500 ${
+              d.isToday
+                ? 'bg-gradient-to-t from-amber-500 to-amber-300'
+                : d.mins > 0
+                  ? 'bg-gradient-to-t from-emerald-600 to-emerald-400'
+                  : 'bg-slate-300 dark:bg-slate-700'
+            }" style="height: ${heightPct}%"></div>
+          </div>
+          <span class="text-[10px] font-medium ${d.isToday ? 'text-amber-500 font-bold' : 'text-slate-500 dark:text-slate-400'}">
+            ${formatShortDate(d.dStr)}
+          </span>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    function renderSyllabusOverview() {
+      const listEl = document.getElementById('syllabus-progress-list');
+      listEl.innerHTML = '';
+
+      // Compute cumulative minutes per subject across all logged days
+      const subTotals = {};
+      state.config.subjects.forEach(s => subTotals[s.id] = 0);
+
+      Object.values(state.logs).forEach(dayLog => {
+        if (dayLog && dayLog.subjects) {
+          Object.entries(dayLog.subjects).forEach(([subId, entry]) => {
+            if (subTotals[subId] !== undefined) {
+              subTotals[subId] += (Number(entry.mins) || 0);
+            }
+          });
+        }
+      });
+
+      state.config.subjects.forEach(sub => {
+        const total = Math.max(1, Number(sub.totalChapters) || 1);
+        const done = Math.min(total, Math.max(0, Number(sub.completedChapters) || 0));
+        const pct = Math.round((done / total) * 100);
+        const investedHrs = ((subTotals[sub.id] || 0) / 60).toFixed(1);
+
+        const item = document.createElement('div');
+        item.className = 'space-y-1';
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-800 dark:text-slate-200 truncate pr-2">${sub.name}</span>
+            <div class="flex items-center gap-2 shrink-0 text-[11px] text-slate-500 dark:text-slate-400">
+              <span>${toLocalizedNum(investedHrs)}h</span>
+              <span class="font-bold text-indigo-600 dark:text-indigo-400">${toLocalizedNum(done)}/${toLocalizedNum(total)} (${toLocalizedNum(pct)}%)</span>
+            </div>
+          </div>
+          <div class="w-full h-2 bg-slate-100 dark:bg-slateDark-800 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    // =========================================================
+    // 9. SETTINGS MODAL & CONFIGURATION
+    // =========================================================
+    let draftSubjects = [];
+
+    function openSettingsModal() {
+      try {
+        document.getElementById('cfg-level').value = state.config.level || '';
+        document.getElementById('cfg-academic-goal').value = state.config.academicGoal || '';
+        document.getElementById('cfg-dream-goal').value = state.config.dreamGoal || '';
+        document.getElementById('cfg-daily-goal').value = state.config.dailyGoalHours || 5;
+
+        const startInput = document.getElementById('cfg-start-date');
+        const examInput = document.getElementById('cfg-exam-date');
+        const remInput = document.getElementById('cfg-remaining-days');
+
+        if (startInput) startInput.value = state.config.startDate;
+        if (examInput) examInput.value = state.config.examDate;
+        if (remInput) {
+          remInput.value = Math.max(1, diffDays(getLocalTodayStr(), state.config.examDate));
+        }
+
+        draftSubjects = JSON.parse(JSON.stringify(state.config.subjects || []));
+        renderSettingsSubjects();
+
+        const modal = document.getElementById('settings-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Error opening settings modal:', err);
+      }
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function syncRemainingFromExamDate() {
+      const examVal = document.getElementById('cfg-exam-date').value;
+      if (!examVal) return;
+      const rem = Math.max(1, diffDays(getLocalTodayStr(), examVal));
+      document.getElementById('cfg-remaining-days').value = rem;
+    }
+
+    function applyRemainingDaysInput() {
+      const rem = parseInt(document.getElementById('cfg-remaining-days').value, 10);
+      if (!rem || rem < 1) return;
+      document.getElementById('cfg-exam-date').value = addDaysToDateStr(getLocalTodayStr(), rem);
+    }
+
+    function syncExamDateFromRemaining() {
+      // Keeps remaining days synced when start date changes
+      syncRemainingFromExamDate();
+    }
+
+    function renderSettingsSubjects() {
+      const container = document.getElementById('settings-subjects-list');
+      container.innerHTML = '';
+
+      draftSubjects.forEach((sub, idx) => {
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-12 gap-2 items-center bg-slate-50 dark:bg-slateDark-850 p-2 rounded-xl border border-slate-200 dark:border-slate-800';
+        row.innerHTML = `
+          <input type="text" value="${escapeHtml(sub.name)}" onchange="draftSubjects[${idx}].name = this.value" required
+            class="col-span-6 rounded-lg bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+          <input type="number" min="0" max="100" value="${sub.completedChapters}" onchange="draftSubjects[${idx}].completedChapters = parseInt(this.value,10)||0"
+            class="col-span-2 rounded-lg bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 px-2 py-1.5 text-xs text-center focus:outline-none" />
+          <input type="number" min="1" max="100" value="${sub.totalChapters}" onchange="draftSubjects[${idx}].totalChapters = Math.max(1, parseInt(this.value,10)||1)"
+            class="col-span-2 rounded-lg bg-white dark:bg-slateDark-900 border border-slate-200 dark:border-slate-700 px-2 py-1.5 text-xs text-center focus:outline-none" />
+          <div class="col-span-2 flex justify-end">
+            <button type="button" onclick="removeDraftSubject(${idx})" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 cursor-pointer" title="Remove">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      lucide.createIcons();
+    }
+
+    function addNewSubjectRow() {
+      draftSubjects.push({
+        id: 'sub_' + Date.now(),
+        name: state.lang === 'bn' ? 'নতুন বিষয়' : 'New Subject',
+        color: 'emerald',
+        completedChapters: 0,
+        totalChapters: 12
+      });
+      renderSettingsSubjects();
+    }
+
+    function removeDraftSubject(idx) {
+      if (draftSubjects.length <= 1) {
+        showToast(state.lang === 'bn' ? 'অন্তত ১টি বিষয় থাকতে হবে!' : 'At least 1 subject required!', 'warning');
+        return;
+      }
+      draftSubjects.splice(idx, 1);
+      renderSettingsSubjects();
+    }
+
+    function saveSettings(e) {
+      e.preventDefault();
+      const startInput = document.getElementById('cfg-start-date');
+      const examInput = document.getElementById('cfg-exam-date');
+      const startDate = startInput ? startInput.value : state.config.startDate;
+      const examDate = examInput ? examInput.value : state.config.examDate;
+
+      if (examDate <= startDate) {
+        showToast(
+          state.lang === 'bn'
+            ? 'পরীক্ষার তারিখ শুরুর তারিখের পরে হতে হবে!'
+            : 'Exam date must be after start date!',
+          'warning'
+        );
+        return;
+      }
+
+      state.config.level = document.getElementById('cfg-level').value.trim();
+      state.config.academicGoal = document.getElementById('cfg-academic-goal').value.trim();
+      state.config.dreamGoal = document.getElementById('cfg-dream-goal').value.trim();
+      const parsedGoal = parseFloat(document.getElementById('cfg-daily-goal').value);
+      state.config.dailyGoalHours = Math.min(16, Math.max(1, isNaN(parsedGoal) ? 5 : parsedGoal));
+      state.config.startDate = startDate;
+      state.config.examDate = examDate;
+      state.config.subjects = draftSubjects.filter(s => s.name.trim() !== '');
+
+      saveState();
+      closeSettingsModal();
+      renderAll();
+      showToast(I18N[state.lang].savedToast, 'success');
+    }
+
+    function exportBackupData() {
+      try {
+        const dataStr = JSON.stringify(state, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `hsc-life-tracker-backup-${getLocalTodayStr()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(
+          state.lang === 'bn' ? 'ব্যাকআপ ফাইল ডাউনলোড হয়েছে!' : 'Backup file downloaded!',
+          'success'
+        );
+      } catch (e) {
+        showToast(
+          state.lang === 'bn' ? 'ব্যাকআপ ডাউনলোড ব্যর্থ হয়েছে।' : 'Failed to export backup.',
+          'warning'
+        );
+      }
+    }
+
+    function importBackupData(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!imported || !imported.config || !imported.logs) {
+            throw new Error('Invalid backup structure');
+          }
+          if (!imported.config.dailyGoalHours) {
+            imported.config.dailyGoalHours = 5;
+          }
+          imported.selectedDate = getLocalTodayStr();
+          state = imported;
+          saveState();
+          closeSettingsModal();
+          applyTheme();
+          applyLanguage();
+          renderAll();
+          showToast(
+            state.lang === 'bn' ? 'ব্যাকআপ সফলভাবে রিস্টোর হয়েছে!' : 'Backup restored successfully!',
+            'success'
+          );
+        } catch (err) {
+          showToast(
+            state.lang === 'bn' ? 'সঠিক ব্যাকআপ JSON ফাইল নির্বাচন করুন।' : 'Invalid JSON backup file.',
+            'warning'
+          );
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetToDefaultDemoData() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = createDefaultState();
+      saveState();
+      closeSettingsModal();
+      applyTheme();
+      applyLanguage();
+      renderAll();
+      showToast(I18N[state.lang].savedToast, 'success');
+    }
+
+    // =========================================================
+    // 10. THEME, LANGUAGE & TOAST UTILITIES
+    // =========================================================
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      saveState();
+      applyTheme();
+    }
+
+    function applyTheme() {
+      const html = document.documentElement;
+      if (state.theme === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+    }
+
+    function toggleLanguage() {
+      state.lang = state.lang === 'bn' ? 'en' : 'bn';
+      saveState();
+      applyLanguage();
+      renderAll();
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = state.lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (I18N[state.lang][key]) {
+          el.textContent = I18N[state.lang][key];
+        }
+      });
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors =
+        type === 'success'
+          ? 'bg-emerald-950/95 border-emerald-500/50 text-emerald-200'
+          : type === 'warning'
+            ? 'bg-amber-950/95 border-amber-500/50 text-amber-200'
+            : 'bg-slate-900/95 border-slate-700 text-slate-100';
+
+      toast.className = `pointer-events-auto border ${colors} px-4 py-3 rounded-2xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5 backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-emerald-400' : 'bg-amber-400'} shrink-0"></span>
+        <span>${escapeHtml(message)}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // =========================================================
+    // 11. OVERVIEW PAGE (ADDITIVE) — navigation, quotes, syllabus,
+    //     weekly performance, spaced-repetition revisions.
+    // Single source of truth: state.config.subjects (chapters) and
+    // state.logs (study records). The only new persisted data is
+    // state.revisions.done = { "<studyDate>|<subjectId>|<n>": {...} }
+    // =========================================================
+    const OV = {
+      bn: {
+        navOverview: 'ওভারভিউ', navTracker: 'আমার ট্র্যাকার',
+        quoteLabel: 'আজকের অনুপ্রেরণা', quoteNext: 'আরেকটি উক্তি',
+        sumSyllabus: 'সিলেবাস সম্পন্ন', sumTotalHours: 'মোট পড়ার সময়', sumStreak: 'বর্তমান স্ট্রিক',
+        sumWeek: 'এই সপ্তাহের পড়া', sumPending: 'বাকি রিভিশন', sumChapters: 'সম্পন্ন অধ্যায়',
+        unitDays: 'দিন', unitHours: 'ঘণ্টা', sumPendingSub: 'আজ ও বিলম্বিত: {n}',
+        sylTitle: 'HSC সিলেবাস সম্পন্নের হার', sylSub: 'আপনার বিষয়ভিত্তিক অধ্যায়ের তথ্য থেকে গণনা করা',
+        sylTotal: 'মোট অধ্যায়', sylDone: 'সম্পন্ন', sylLeft: 'বাকি', sylComplete: 'সম্পন্ন',
+        sylNoSubjects: 'কোনো বিষয় যোগ করা নেই। সেটিংস থেকে বিষয় ও অধ্যায় যোগ করুন।',
+        sylNoChapters: 'অধ্যায় যোগ করা হয়নি',
+        wkTitle: 'এই সপ্তাহে আমার পারফরম্যান্স', wkSub: 'গত ৭ দিন (আজসহ) · সংরক্ষিত রেকর্ড থেকে',
+        wkEmptyTitle: 'এই সপ্তাহের কোনো পড়ার রেকর্ড নেই',
+        wkEmptyDesc: 'ট্র্যাকার পেজে পড়ার সময় বা সম্পন্ন বিষয় যোগ করলে এখানে পারফরম্যান্স দেখা যাবে।',
+        wkTime: 'পড়ার সময়', wkSubjects: 'সম্পন্ন বিষয়', wkRate: 'সম্পন্নের হার', wkSessions: 'পড়ার সেশন',
+        wkVsPrev: 'আগের দিনের সঙ্গে তুলনা', wkTimeDiff: 'পড়ার সময়ের পার্থক্য', wkSubjDiff: 'সম্পন্ন বিষয়ের পার্থক্য',
+        wkTrend: 'প্রবণতা', trendUp: 'উন্নতি', trendDown: 'অবনতি', trendFlat: 'উল্লেখযোগ্য পরিবর্তন নেই',
+        wkNoPrev: 'আগের দিনের রেকর্ড নেই, তাই তুলনা করা যাচ্ছে না।',
+        wkTotal: 'সাপ্তাহিক মোট', wkAvg: 'দৈনিক গড়', wkBest: 'সেরা দিন', wkWeekRate: 'বিষয় সম্পন্নের হার',
+        wkGoal: 'দৈনিক লক্ষ্য', wkSessionNote: 'সেশন = যে বিষয়ে সময় যোগ হয়েছে', subjUnit: 'টি বিষয়', wkToday: 'আজ',
+        rvTitle: 'Revision Reminder — আজকের রিভিশন',
+        rvSub: 'অধ্যায় পড়ার ১, ৩ ও ৭ দিন পর স্বয়ংক্রিয় রিভিশন',
+        rvTabDue: 'আজ ও বিলম্বিত', rvTabUp: 'আসন্ন', rvTabDone: 'সম্পন্ন',
+        rvRemain: 'বাকি', rvOverdue: 'বিলম্বিত', rvStudied: 'পড়া হয়েছে', rvDue: 'ডিউ',
+        rvMark: 'সম্পন্ন করুন', rvUndo: 'ফিরিয়ে নিন', rvOpen: 'মূল দিন দেখুন', rvRevision: 'রিভিশন',
+        rvStToday: 'আজ ডিউ', rvStOver: '{n} দিন বিলম্বিত', rvStUp: '{n} দিন পরে', rvStDone: 'সম্পন্ন · {d}',
+        rvEmptyDueT: 'আজ কোনো রিভিশন বাকি নেই', rvEmptyDueD: 'নতুন অধ্যায় পড়ে ট্র্যাকারে নাম লিখলে রিভিশন তৈরি হবে।',
+        rvEmptyUpT: 'কোনো আসন্ন রিভিশন নেই', rvEmptyUpD: 'নতুন অধ্যায় পড়লে এখানে পরবর্তী রিভিশন দেখা যাবে।',
+        rvEmptyDoneT: 'এখনো কোনো রিভিশন সম্পন্ন হয়নি', rvEmptyDoneD: 'সম্পন্ন করা রিভিশন এখানে জমা থাকবে।',
+        rvHow: 'ট্র্যাকারে বিষয়ের অধ্যায়ের নাম লিখে বিষয়টি সম্পন্ন করলে (বা সময় যোগ করলে) রিভিশন তৈরি হয়।',
+        rvMore: 'আরও {n}টি আছে', rvOrd: ['১ম', '২য়', '৩য়'], unknownSubject: 'অজানা বিষয়',
+        weekdaysShort: ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'],
+        weekdaysLong: ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার']
+      },
+      en: {
+        navOverview: 'Overview', navTracker: 'My Tracker',
+        quoteLabel: "TODAY'S INSPIRATION", quoteNext: 'Another quote',
+        sumSyllabus: 'Syllabus done', sumTotalHours: 'Total study time', sumStreak: 'Current streak',
+        sumWeek: 'This week', sumPending: 'Pending revisions', sumChapters: 'Chapters done',
+        unitDays: 'days', unitHours: 'hrs', sumPendingSub: 'Due today & overdue: {n}',
+        sylTitle: 'HSC Syllabus Completion', sylSub: 'Calculated from your subject chapter data',
+        sylTotal: 'Total chapters', sylDone: 'Completed', sylLeft: 'Remaining', sylComplete: 'complete',
+        sylNoSubjects: 'No subjects added. Add subjects and chapters from Settings.',
+        sylNoChapters: 'No chapters added',
+        wkTitle: 'My Performance This Week', wkSub: 'Last 7 days (including today) · from saved records',
+        wkEmptyTitle: 'No study records this week',
+        wkEmptyDesc: 'Add study time or complete subjects in the tracker and your performance will show up here.',
+        wkTime: 'Study time', wkSubjects: 'Subjects done', wkRate: 'Completion rate', wkSessions: 'Study sessions',
+        wkVsPrev: 'Compared with previous day', wkTimeDiff: 'Study time difference', wkSubjDiff: 'Completed subjects difference',
+        wkTrend: 'Trend', trendUp: 'Improved', trendDown: 'Declined', trendFlat: 'No significant change',
+        wkNoPrev: 'No record for the previous day, so no comparison is possible.',
+        wkTotal: 'Weekly total', wkAvg: 'Daily average', wkBest: 'Best day', wkWeekRate: 'Subject completion rate',
+        wkGoal: 'Daily goal', wkSessionNote: 'Session = a subject with time logged', subjUnit: ' subjects', wkToday: 'Today',
+        rvTitle: "Revision Reminder — Today's Revision",
+        rvSub: 'Automatic revisions 1, 3 and 7 days after you study a chapter',
+        rvTabDue: 'Today & overdue', rvTabUp: 'Upcoming', rvTabDone: 'Completed',
+        rvRemain: 'Remaining', rvOverdue: 'Overdue', rvStudied: 'Studied', rvDue: 'Due',
+        rvMark: 'Mark done', rvUndo: 'Undo', rvOpen: 'View original day', rvRevision: 'revision',
+        rvStToday: 'Due today', rvStOver: '{n} day(s) overdue', rvStUp: 'In {n} day(s)', rvStDone: 'Done · {d}',
+        rvEmptyDueT: 'No revisions due today', rvEmptyDueD: 'Revisions appear when you write a chapter name in the tracker.',
+        rvEmptyUpT: 'No upcoming revisions', rvEmptyUpD: 'Study a new chapter and the next revisions will show here.',
+        rvEmptyDoneT: 'No revisions completed yet', rvEmptyDoneD: 'Completed revisions are kept here.',
+        rvHow: 'Revisions are created when you write a chapter name for a subject and complete it (or log time) in the tracker.',
+        rvMore: '{n} more not shown', rvOrd: ['1st', '2nd', '3rd'], unknownSubject: 'Unknown subject',
+        weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        weekdaysLong: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      }
+    };
+
+    const OV_QUOTES = [
+      'প্রতিদিনের ছোট ছোট প্রচেষ্টাই একদিন অসাধারণ সাফল্যে পরিণত হয়।',
+      'সময় কখনো অপেক্ষা করে না। তাই নিজের স্বপ্নের জন্য আজ থেকেই কাজ শুরু করো।',
+      'ধারাবাহিকতা প্রতিভার চেয়ে অনেক বেশি দূর নিয়ে যায়।',
+      'আজকের পড়াটুকু আজই শেষ করো; কালকের তুমি তোমাকে ধন্যবাদ দেবে।',
+      'বড় লক্ষ্যকে ছোট ছোট ধাপে ভাগ করো, তারপর প্রতিদিন একটি করে ধাপ পার হও।',
+      'ধৈর্য মানে শুধু অপেক্ষা নয়; অপেক্ষার সময়টাতেও কাজ চালিয়ে যাওয়াই ধৈর্য।',
+      'যে সময়কে সম্মান করে, সময়ও একদিন তাকে সম্মান ফিরিয়ে দেয়।',
+      'প্রেরণা কয়েক দিনের অতিথি, অভ্যাসই আসল সঙ্গী।',
+      'ভুল করা লজ্জার নয়; একই ভুল বারবার না শোধরানোই আসল ক্ষতি।',
+      'পরীক্ষার ফল একদিনের, কিন্তু প্রস্তুতি গড়ে ওঠে প্রতিটি দিনের পরিশ্রমে।',
+      'কঠিন অধ্যায় এড়িয়ে গেলে সে আরও কঠিন হয়ে ফিরে আসে; আজই তার মুখোমুখি হও।',
+      'মনোযোগ তোমার সবচেয়ে দামি সম্পদ; তাকে অকারণে খরচ কোরো না।',
+      'অন্যের গতির সঙ্গে নয়, গতকালের নিজের সঙ্গে নিজেকে তুলনা করো।',
+      'ক্লান্ত লাগলে থামো, বিশ্রাম নাও; কিন্তু হাল ছেড়ো না।',
+      'যে পথ যত লম্বা, তার গন্তব্য তত সুন্দর।',
+      'প্রতিটি সমাধান করা অঙ্ক আত্মবিশ্বাসের একটি করে ইট।',
+      'পরিকল্পনা ছাড়া পরিশ্রম দিশাহীন, আর পরিশ্রম ছাড়া পরিকল্পনা কাগজের লেখা মাত্র।',
+      'আজ যতটুকু পারো করো, কাল তার ওপর আরেকটু যোগ করো—এভাবেই পাহাড় গড়ে ওঠে।',
+      'রিভিশন মানে নতুন করে শেখা নয়, শেখাকে স্থায়ী করা।',
+      'সকালের প্রথম ঘণ্টাটা তোমার, ফোনের নয়।',
+      'স্বপ্ন দেখা সহজ; সেই স্বপ্নের জন্য প্রতিদিন পড়তে বসাটাই আসল সাহসের কাজ।',
+      'ব্যর্থতা শেষ নয়; এটা শুধু জানিয়ে দেয় কোন জায়গায় আরও মনোযোগ দরকার।',
+      'নিয়ম মানার কষ্ট সাময়িক, নিয়ম না মানার আক্ষেপ দীর্ঘস্থায়ী।',
+      'যা তুমি সত্যিই বুঝে শিখেছ, পরীক্ষার হলে তা তোমাকে ছেড়ে যাবে না।',
+      'আজকের অস্বস্তিই আগামী দিনের স্বস্তির দাম।',
+      'লক্ষ্য ঠিক থাকলে ধীরে চলাও এগিয়ে চলা।'
+    ];
+
+    const OV_REV_OFFSETS = [1, 3, 7];
+    let currentPage = 'overview';
+    let ovSelectedDay = null;
+    let ovRevTab = 'due';
+    let ovQuoteOffset = 0;
+    let ovAnimate = true;
+
+    function ovT() { return OV[state.lang] || OV.bn; }
+    function ovFill(str, vars) { return str.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : '')); }
+    function ovNum(n) { return toLocalizedNum(n); }
+    function ovPct1(p) { return ovNum(Math.round(p * 10) / 10); }
+
+    function ovFmtMins(mins, signed) {
+      const sign = mins < 0 ? '-' : (signed && mins > 0 ? '+' : '');
+      const a = Math.abs(Math.round(mins));
+      const h = Math.floor(a / 60), m = a % 60;
+      if (state.lang === 'en') return `${sign}${h}h ${m}m`;
+      const parts = [];
+      if (h) parts.push(`${ovNum(h)} ঘণ্টা`);
+      if (m) parts.push(`${ovNum(m)} মিনিট`);
+      if (!parts.length) parts.push('০ ঘণ্টা');
+      return sign + parts.join(' ');
+    }
+
+    function ovHrs(mins) { return ovNum((mins / 60).toFixed(1)); }
+
+    function ensureRevisionState() {
+      if (!state.revisions || typeof state.revisions !== 'object') state.revisions = {};
+      if (!state.revisions.done || typeof state.revisions.done !== 'object') state.revisions.done = {};
+      return state.revisions;
+    }
+
+    // ---------------- Navigation ----------------
+    function renderPageNav() {
+      const t = ovT();
+      const active = 'bg-white dark:bg-slateDark-800 text-emerald-700 dark:text-emerald-300 shadow-sm';
+      const idle = 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200';
+      [['nav-overview', 'overview', t.navOverview], ['nav-tracker', 'tracker', t.navTracker]].forEach(([id, page, label]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const on = currentPage === page;
+        el.textContent = label;
+        el.className = `flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-semibold transition cursor-pointer ${on ? active : idle}`;
+        if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+      });
+    }
+
+    function switchPage(page) {
+      currentPage = page === 'tracker' ? 'tracker' : 'overview';
+      const ovEl = document.getElementById('page-overview');
+      const trEl = document.getElementById('page-tracker');
+      ovEl.classList.toggle('hidden', currentPage !== 'overview');
+      trEl.classList.toggle('hidden', currentPage !== 'tracker');
+      hideGridTooltip();
+      if (currentPage === 'overview') {
+        ovAnimate = true;
+        renderOverview();
+      } else {
+        trEl.classList.remove('ov-fade-o');
+        void trEl.offsetWidth;
+        trEl.classList.add('ov-fade-o');
+        renderPageNav();
+      }
+      window.scrollTo({ top: 0 });
+    }
+
+    function openStudyDay(dateStr) {
+      if (!dateStr) return;
+      switchPage('tracker');
+      state.selectedDate = dateStr;
+      saveState();
+      renderLifeGrid();
+      renderDailyTracker();
+      const target = document.getElementById('selected-date-heading');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ---------------- Shared UI helpers ----------------
+    function ovCard(inner, anim) {
+      return `<section class="rounded-3xl border border-slate-200 dark:border-slate-800/90 bg-white dark:bg-slateDark-900 p-5 sm:p-6 ${anim ? 'ov-fade' : ''}">${inner}</section>`;
+    }
+    function ovEmpty(title, desc) {
+      return `<div class="flex flex-col items-center justify-center text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-700/80 px-6 py-8">
+        <div class="text-sm font-semibold text-slate-700 dark:text-slate-200">${escapeHtml(title)}</div>
+        <div class="text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed max-w-md">${escapeHtml(desc)}</div>
+      </div>`;
+    }
+    function ovTitle(title, sub) {
+      return `<div class="min-w-0"><h3 class="text-lg font-bold text-slate-900 dark:text-white">${escapeHtml(title)}</h3>${sub ? `<p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(sub)}</p>` : ''}</div>`;
+    }
+
+    // ---------------- Master render ----------------
+    function renderOverview() {
+      ensureRevisionState();
+      renderPageNav();
+      renderOvQuote();
+      renderOvSummary();
+      renderOvSyllabus();
+      renderOvWeekly();
+      renderOvRevisions();
+      ovAnimate = false;
+    }
+
+    // ---------------- Quote ----------------
+    function ovQuoteIndex() {
+      const n = OV_QUOTES.length;
+      const d = diffDays('2026-01-01', getLocalTodayStr()) + ovQuoteOffset;
+      return ((d % n) + n) % n;
+    }
+    function renderOvQuote() {
+      const t = ovT();
+      const idx = ovQuoteIndex();
+      document.getElementById('ov-quote').innerHTML = `
+        <section class="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800/90 bg-white dark:bg-slateDark-900 p-6 sm:p-8 ${ovAnimate ? 'ov-fade' : ''}">
+          <div class="absolute -right-16 -top-20 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+          <div class="relative">
+            <div class="text-xs font-semibold tracking-wider text-emerald-600 dark:text-emerald-400">${escapeHtml(t.quoteLabel)}</div>
+            <blockquote class="mt-3 font-serifBangla text-xl sm:text-2xl lg:text-[1.75rem] leading-relaxed text-slate-800 dark:text-slate-100 max-w-4xl">“${escapeHtml(OV_QUOTES[idx])}”</blockquote>
+            <div class="mt-5 flex items-center justify-between gap-3">
+              <span class="text-xs text-slate-400 dark:text-slate-500">${ovNum(idx + 1)} / ${ovNum(OV_QUOTES.length)}</span>
+              <button type="button" onclick="nextOvQuote()" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer">${escapeHtml(t.quoteNext)} →</button>
+            </div>
+          </div>
+        </section>`;
+    }
+    function nextOvQuote() {
+      ovQuoteOffset++;
+      const keep = ovAnimate;
+      ovAnimate = true;
+      renderOvQuote();
+      ovAnimate = keep;
+    }
+
+    // ---------------- Syllabus data (reads existing subject data only) ----------------
+    function ovSyllabusData() {
+      const subjects = (state.config.subjects || []).map(s => {
+        const total = Math.max(0, Math.floor(Number(s.totalChapters) || 0));
+        const done = Math.min(total, Math.max(0, Math.floor(Number(s.completedChapters) || 0)));
+        return { id: s.id, name: s.name, total, done, remaining: total - done, pct: total > 0 ? Math.round((done / total) * 100) : 0 };
+      });
+      const total = subjects.reduce((a, s) => a + s.total, 0);
+      const done = subjects.reduce((a, s) => a + s.done, 0);
+      return { subjects, total, done, remaining: total - done, pct: total > 0 ? (done / total) * 100 : 0 };
+    }
+
+    function ovTotalMinutesAllTime() {
+      let m = 0;
+      Object.values(state.logs || {}).forEach(l => {
+        if (l && l.subjects) Object.values(l.subjects).forEach(s => { m += Number(s.mins) || 0; });
+      });
+      return m;
+    }
+
+    function ovWeekDays() {
+      const today = getLocalTodayStr();
+      const days = [];
+      for (let i = 6; i >= 0; i--) days.push(ovDayStats(addDaysToDateStr(today, -i)));
+      return days;
+    }
+
+    // ---------------- Quick summary ----------------
+    function renderOvSummary() {
+      const t = ovT();
+      const syl = ovSyllabusData();
+      const week = ovWeekDays();
+      const weekMins = week.reduce((a, d) => a + d.mins, 0);
+      const rev = ovBuildRevisions();
+      const pending = rev.dueList.length + rev.upList.length;
+      const tiles = [
+        { label: t.sumSyllabus, value: `${ovPct1(syl.pct)}%`, accent: true },
+        { label: t.sumTotalHours, value: `${ovHrs(ovTotalMinutesAllTime())} <span class="text-sm font-medium text-slate-400">${t.unitHours}</span>` },
+        { label: t.sumStreak, value: `${ovNum(calculateStudyStreak())} <span class="text-sm font-medium text-slate-400">${t.unitDays}</span>` },
+        { label: t.sumWeek, value: `${ovHrs(weekMins)} <span class="text-sm font-medium text-slate-400">${t.unitHours}</span>` },
+        { label: t.sumPending, value: ovNum(pending), sub: ovFill(t.sumPendingSub, { n: ovNum(rev.dueList.length) }) },
+        { label: t.sumChapters, value: `${ovNum(syl.done)} <span class="text-sm font-medium text-slate-400">/ ${ovNum(syl.total)}</span>` }
+      ];
+      document.getElementById('ov-summary').innerHTML = `
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 ${ovAnimate ? 'ov-fade' : ''}">
+          ${tiles.map(x => `
+            <div class="rounded-2xl border border-slate-200 dark:border-slate-800/90 bg-white dark:bg-slateDark-900 p-4">
+              <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(x.label)}</div>
+              <div class="mt-1.5 text-2xl font-bold ${x.accent ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}">${x.value}</div>
+              ${x.sub ? `<div class="mt-1 text-[11px] text-slate-400 dark:text-slate-500">${escapeHtml(x.sub)}</div>` : ''}
+            </div>`).join('')}
+        </div>`;
+    }
+
+    // ---------------- Syllabus dashboard ----------------
+    function renderOvSyllabus() {
+      const t = ovT();
+      const el = document.getElementById('ov-syllabus');
+      const syl = ovSyllabusData();
+      const head = `<div class="mb-5">${ovTitle(t.sylTitle, t.sylSub)}</div>`;
+      if (!syl.subjects.length) {
+        el.innerHTML = ovCard(head + ovEmpty(t.sylTitle, t.sylNoSubjects), ovAnimate);
+        return;
+      }
+      const R = 68, C = 2 * Math.PI * R;
+      const target = C * (1 - syl.pct / 100);
+      const statBox = (label, val) => `
+        <div class="rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200/80 dark:border-slate-800 px-3 py-2.5 text-center">
+          <div class="text-lg font-bold text-slate-900 dark:text-white">${ovNum(val)}</div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400">${escapeHtml(label)}</div>
+        </div>`;
+      const rows = syl.subjects.map(s => `
+        <div>
+          <div class="flex items-center justify-between gap-2 text-sm">
+            <span class="font-semibold text-slate-800 dark:text-slate-200 truncate">${escapeHtml(s.name)}</span>
+            <span class="shrink-0 text-xs font-semibold ${s.total ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}">${s.total ? `${ovNum(s.done)}/${ovNum(s.total)} · ${ovNum(s.pct)}%` : escapeHtml(t.sylNoChapters)}</span>
+          </div>
+          <div class="mt-1.5 w-full h-2 rounded-full bg-slate-100 dark:bg-slateDark-800 overflow-hidden">
+            <div class="h-full rounded-full bg-emerald-500 ${ovAnimate ? 'ov-hbar' : ''}" style="width:${s.pct}%"></div>
+          </div>
+        </div>`).join('');
+      el.innerHTML = ovCard(`
+        ${head}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          <div class="lg:col-span-4 flex flex-col items-center">
+            <div class="relative w-40 h-40 sm:w-44 sm:h-44">
+              <svg viewBox="0 0 160 160" class="w-full h-full -rotate-90" role="img" aria-label="${ovPct1(syl.pct)}%">
+                <circle cx="80" cy="80" r="${R}" fill="none" stroke-width="12" class="stroke-slate-200 dark:stroke-slateDark-700"></circle>
+                <circle id="ov-ring" cx="80" cy="80" r="${R}" fill="none" stroke-width="12" stroke-linecap="round" class="ov-ring stroke-emerald-500" stroke-dasharray="${C.toFixed(2)}" style="stroke-dashoffset:${ovAnimate ? C.toFixed(2) : target.toFixed(2)}"></circle>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <div class="text-3xl font-bold text-slate-900 dark:text-white">${ovPct1(syl.pct)}%</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(t.sylComplete)}</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 w-full mt-5">
+              ${statBox(t.sylTotal, syl.total)}${statBox(t.sylDone, syl.done)}${statBox(t.sylLeft, syl.remaining)}
+            </div>
+          </div>
+          <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5 content-start">${rows}</div>
+        </div>`, ovAnimate);
+      if (ovAnimate) {
+        const ring = document.getElementById('ov-ring');
+        requestAnimationFrame(() => requestAnimationFrame(() => { if (ring) ring.style.strokeDashoffset = target.toFixed(2); }));
+      }
+    }
+
+    // ---------------- Weekly performance ----------------
+    function ovDayStats(dateStr) {
+      const total = (state.config.subjects || []).length;
+      const log = state.logs[dateStr];
+      const subs = log && log.subjects ? Object.values(log.subjects) : [];
+      const done = getDayCompletedSubjectsCount(dateStr);
+      return {
+        date: dateStr,
+        mins: getDayTotalMinutes(dateStr),
+        done,
+        total,
+        pct: total > 0 ? Math.round((done / total) * 100) : 0,
+        sessions: subs.filter(s => (Number(s.mins) || 0) > 0).length,
+        hasRecord: dateStr >= state.config.startDate
+      };
+    }
+
+    function ovTrend(prev, cur) {
+      const dMins = cur.mins - prev.mins;
+      const dDone = cur.done - prev.done;
+      const score = (Math.abs(dMins) >= 15 ? Math.sign(dMins) : 0) + Math.sign(dDone);
+      return { dMins, dDone, key: score > 0 ? 'up' : score < 0 ? 'down' : 'flat' };
+    }
+
+    function ovTrendStyle(key) {
+      if (key === 'up') return { glyph: '▲', cls: 'text-emerald-600 dark:text-emerald-400', badge: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30' };
+      if (key === 'down') return { glyph: '▼', cls: 'text-rose-500 dark:text-rose-400', badge: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30' };
+      return { glyph: '–', cls: 'text-slate-400', badge: 'bg-slate-200/70 dark:bg-slateDark-800 text-slate-600 dark:text-slate-300 border-slate-300/60 dark:border-slate-700' };
+    }
+
+    function selectOvDay(dateStr) {
+      ovSelectedDay = dateStr;
+      renderOvWeekly();
+    }
+
+    function renderOvWeekly() {
+      const t = ovT();
+      const el = document.getElementById('ov-weekly');
+      const today = getLocalTodayStr();
+      const days = ovWeekDays();
+      if (!ovSelectedDay || !days.some(d => d.date === ovSelectedDay)) ovSelectedDay = today;
+      const head = `<div class="mb-5">${ovTitle(t.wkTitle, t.wkSub)}</div>`;
+
+      if (!days.some(d => d.mins > 0 || d.done > 0)) {
+        el.innerHTML = ovCard(head + ovEmpty(t.wkEmptyTitle, t.wkEmptyDesc), ovAnimate);
+        return;
+      }
+
+      const goalMins = Math.max(0.5, Number(state.config.dailyGoalHours) || 5) * 60;
+      const scaleMax = Math.max(goalMins, ...days.map(d => d.mins)) * 1.15;
+      const goalBottom = (goalMins / scaleMax) * 100;
+      const dayName = (ds, long) => (long ? t.weekdaysLong : t.weekdaysShort)[parseLocalDate(ds).getDay()];
+
+      const bars = days.map((d, i) => {
+        const prev = i > 0 ? days[i - 1] : ovDayStats(addDaysToDateStr(d.date, -1));
+        const comparable = prev.hasRecord && d.hasRecord;
+        const tr = comparable ? ovTrendStyle(ovTrend(prev, d).key) : { glyph: '·', cls: 'text-slate-400' };
+        const h = d.mins > 0 ? Math.max(3, (d.mins / scaleMax) * 100) : 0;
+        const sel = d.date === ovSelectedDay;
+        const tip = `${formatReadableDate(d.date)} — ${ovFmtMins(d.mins)} · ${ovNum(d.done)}/${ovNum(d.total)}`;
+        return { d, tr, h, sel, tip };
+      });
+
+      const chart = `
+        <div class="relative h-44 mt-2">
+          <div class="absolute left-0 right-0 border-t border-dashed border-amber-400/70 pointer-events-none" style="bottom:${goalBottom}%"></div>
+          <div class="absolute right-0 text-[10px] text-amber-500 pointer-events-none" style="bottom:calc(${goalBottom}% + 2px)">${escapeHtml(t.wkGoal)}</div>
+          <div class="absolute inset-0 grid grid-cols-7 gap-2 sm:gap-3">
+            ${bars.map(b => `
+              <button type="button" onclick='selectOvDay(${JSON.stringify(b.d.date)})' title="${escapeHtml(b.tip)}" aria-pressed="${b.sel}" class="group relative h-full flex items-end justify-center cursor-pointer focus:outline-none">
+                ${b.d.mins > 0 ? `<span class="absolute left-0 right-0 text-center text-[10px] sm:text-xs font-semibold ${b.sel ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}" style="bottom:calc(${b.h}% + 4px)">${ovHrs(b.d.mins)}</span>` : ''}
+                <div class="w-full max-w-[44px] rounded-t-lg transition-colors ${ovAnimate ? 'ov-bar' : ''} ${b.sel ? 'bg-emerald-500' : 'bg-emerald-500/30 group-hover:bg-emerald-500/55'}" style="height:${b.h}%"></div>
+              </button>`).join('')}
+          </div>
+        </div>
+        <div class="grid grid-cols-7 gap-2 sm:gap-3 mt-2 border-t border-slate-200 dark:border-slate-800 pt-2">
+          ${bars.map(b => `
+            <button type="button" onclick='selectOvDay(${JSON.stringify(b.d.date)})' class="text-center cursor-pointer focus:outline-none">
+              <div class="text-[11px] sm:text-xs font-semibold ${b.sel ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300'}">${escapeHtml(b.d.date === today ? t.wkToday : dayName(b.d.date))}</div>
+              <div class="text-[10px] text-slate-400">${escapeHtml(formatShortDate(b.d.date))}</div>
+              <div class="text-[11px] mt-0.5 ${b.tr.cls}">${b.tr.glyph}</div>
+            </button>`).join('')}
+        </div>`;
+
+      // Selected day detail + comparison with the previous calendar day
+      const cur = days.find(d => d.date === ovSelectedDay);
+      const prev = ovDayStats(addDaysToDateStr(cur.date, -1));
+      const metric = (label, val) => `
+        <div class="rounded-xl bg-white dark:bg-slateDark-900 border border-slate-200/80 dark:border-slate-800 px-3 py-2.5">
+          <div class="text-[11px] text-slate-500 dark:text-slate-400">${escapeHtml(label)}</div>
+          <div class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">${val}</div>
+        </div>`;
+      let compare;
+      if (!prev.hasRecord || !cur.hasRecord) {
+        compare = `<div class="text-sm text-slate-500 dark:text-slate-400">${escapeHtml(t.wkNoPrev)}</div>`;
+      } else {
+        const tr = ovTrend(prev, cur);
+        const st = ovTrendStyle(tr.key);
+        const label = tr.key === 'up' ? t.trendUp : tr.key === 'down' ? t.trendDown : t.trendFlat;
+        const dDoneTxt = `${tr.dDone > 0 ? '+' : ''}${ovNum(tr.dDone)}${t.subjUnit}`;
+        compare = `
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center justify-between gap-3"><span class="text-slate-500 dark:text-slate-400">${escapeHtml(t.wkTimeDiff)}</span><span class="font-semibold text-slate-900 dark:text-white">${escapeHtml(ovFmtMins(tr.dMins, true))}</span></div>
+            <div class="flex items-center justify-between gap-3"><span class="text-slate-500 dark:text-slate-400">${escapeHtml(t.wkSubjDiff)}</span><span class="font-semibold text-slate-900 dark:text-white">${escapeHtml(dDoneTxt)}</span></div>
+            <div class="flex items-center justify-between gap-3"><span class="text-slate-500 dark:text-slate-400">${escapeHtml(t.wkTrend)}</span><span class="px-2.5 py-0.5 rounded-full border text-xs font-semibold ${st.badge}">${st.glyph} ${escapeHtml(label)}</span></div>
+          </div>`;
+      }
+      const detail = `
+        <div class="rounded-2xl bg-slate-50 dark:bg-slateDark-850 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(dayName(cur.date, true))}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(formatShortDate(cur.date))}</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5 mt-3">
+            ${metric(t.wkTime, escapeHtml(ovFmtMins(cur.mins)))}
+            ${metric(t.wkSubjects, `${ovNum(cur.done)}/${ovNum(cur.total)}`)}
+            ${metric(t.wkRate, `${ovNum(cur.pct)}%`)}
+            ${metric(t.wkSessions, ovNum(cur.sessions))}
+          </div>
+          <div class="text-[10px] text-slate-400 mt-2">${escapeHtml(t.wkSessionNote)}</div>
+          <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2.5">${escapeHtml(t.wkVsPrev)} · ${escapeHtml(dayName(prev.date, true))}</div>
+            ${compare}
+          </div>
+        </div>`;
+
+      // Weekly totals
+      const totalMins = days.reduce((a, d) => a + d.mins, 0);
+      const doneSum = days.reduce((a, d) => a + d.done, 0);
+      const subjCount = (state.config.subjects || []).length;
+      const weekRate = subjCount > 0 ? (doneSum / (days.length * subjCount)) * 100 : 0;
+      const best = days.reduce((b, d) => (d.mins > b.mins ? d : b), { mins: 0 });
+      const stat = (label, val) => `
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800/90 px-4 py-3">
+          <div class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(label)}</div>
+          <div class="text-base font-bold text-slate-900 dark:text-white mt-1">${val}</div>
+        </div>`;
+      const stats = `
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+          ${stat(t.wkTotal, escapeHtml(ovFmtMins(totalMins)))}
+          ${stat(t.wkAvg, escapeHtml(ovFmtMins(totalMins / days.length)))}
+          ${stat(t.wkBest, best.mins > 0 ? `${escapeHtml(dayName(best.date, true))} <span class="text-xs font-medium text-slate-400">${escapeHtml(ovFmtMins(best.mins))}</span>` : '—')}
+          ${stat(t.wkWeekRate, `${ovPct1(weekRate)}%`)}
+        </div>`;
+
+      el.innerHTML = ovCard(`${head}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7">${chart}</div>
+          <div class="lg:col-span-5">${detail}</div>
+        </div>${stats}`, ovAnimate);
+    }
+
+    // ---------------- Spaced repetition (derived from the daily tracker) ----------------
+    function ovCollectStudyEvents() {
+      const today = getLocalTodayStr();
+      const out = [];
+      Object.entries(state.logs || {}).forEach(([date, log]) => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date > today || !log || !log.subjects) return;
+        Object.entries(log.subjects).forEach(([subId, e]) => {
+          const ch = String((e && e.ch) || '').trim();
+          if (ch && (e.done || (Number(e.mins) || 0) > 0)) out.push({ studyDate: date, subId, chapter: ch });
+        });
+      });
+      return out;
+    }
+
+    function ovSubjectName(subId, fallback) {
+      const s = (state.config.subjects || []).find(x => x.id === subId);
+      return s ? s.name : (fallback || ovT().unknownSubject);
+    }
+
+    function ovBuildRevisions() {
+      const done = ensureRevisionState().done;
+      const today = getLocalTodayStr();
+      const seen = new Set();
+      const items = [];
+
+      ovCollectStudyEvents().forEach(ev => {
+        OV_REV_OFFSETS.forEach((off, i) => {
+          const n = i + 1;
+          const key = `${ev.studyDate}|${ev.subId}|${n}`;
+          if (seen.has(key)) return; // never duplicate a reminder
+          seen.add(key);
+          const rec = done[key];
+          items.push({
+            key, studyDate: ev.studyDate, subId: ev.subId, n,
+            chapter: rec && rec.chapter ? rec.chapter : ev.chapter,
+            subjectName: ovSubjectName(ev.subId, rec && rec.subjectName),
+            due: addDaysToDateStr(ev.studyDate, off),
+            completedOn: rec ? rec.completedOn : null
+          });
+        });
+      });
+
+      // Completed records stay visible even if the original study entry was later edited/removed
+      Object.entries(done).forEach(([key, rec]) => {
+        if (seen.has(key) || !rec) return;
+        seen.add(key);
+        items.push({
+          key, studyDate: rec.studyDate, subId: rec.subId, n: rec.n, chapter: rec.chapter || '',
+          subjectName: ovSubjectName(rec.subId, rec.subjectName), due: rec.due, completedOn: rec.completedOn
+        });
+      });
+
+      items.forEach(it => {
+        it.status = it.completedOn ? 'done' : it.due < today ? 'overdue' : it.due === today ? 'today' : 'upcoming';
+      });
+      const byDue = (a, b) => (a.due < b.due ? -1 : a.due > b.due ? 1 : (a.studyDate < b.studyDate ? -1 : 1));
+      return {
+        dueList: items.filter(i => i.status === 'overdue' || i.status === 'today').sort(byDue),
+        upList: items.filter(i => i.status === 'upcoming').sort(byDue),
+        doneList: items.filter(i => i.status === 'done').sort((a, b) => (a.completedOn < b.completedOn ? 1 : a.completedOn > b.completedOn ? -1 : 0)),
+        overdueCount: items.filter(i => i.status === 'overdue').length
+      };
+    }
+
+    function completeRevision(key) {
+      const it = [...ovBuildRevisions().dueList, ...ovBuildRevisions().upList].find(x => x.key === key);
+      if (!it) return;
+      ensureRevisionState().done[key] = {
+        studyDate: it.studyDate, subId: it.subId, subjectName: it.subjectName, chapter: it.chapter,
+        n: it.n, due: it.due, completedOn: getLocalTodayStr()
+      };
+      saveState();
+      renderOvSummary();
+      renderOvRevisions();
+    }
+
+    function undoRevision(key) {
+      const done = ensureRevisionState().done;
+      if (!done[key]) return;
+      delete done[key];
+      saveState();
+      renderOvSummary();
+      renderOvRevisions();
+    }
+
+    function setRevTab(tab) {
+      ovRevTab = tab;
+      renderOvRevisions();
+    }
+
+    function ovRevItemHtml(it) {
+      const t = ovT();
+      const today = getLocalTodayStr();
+      const styles = {
+        overdue: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30',
+        today: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+        upcoming: 'bg-slate-200/70 dark:bg-slateDark-800 text-slate-600 dark:text-slate-300 border-slate-300/60 dark:border-slate-700',
+        done: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+      };
+      const statusText =
+        it.status === 'overdue' ? ovFill(t.rvStOver, { n: ovNum(diffDays(it.due, today)) }) :
+        it.status === 'today' ? t.rvStToday :
+        it.status === 'upcoming' ? ovFill(t.rvStUp, { n: ovNum(diffDays(today, it.due)) }) :
+        ovFill(t.rvStDone, { d: formatShortDate(it.completedOn) });
+      const kq = escapeHtml(JSON.stringify(it.key));
+      const dq = escapeHtml(JSON.stringify(it.studyDate));
+      const action = it.status === 'done'
+        ? `<button type="button" onclick="undoRevision(${kq})" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slateDark-800 dark:hover:bg-slateDark-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer">${escapeHtml(t.rvUndo)}</button>`
+        : `<button type="button" onclick="completeRevision(${kq})" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition cursor-pointer">${escapeHtml(t.rvMark)}</button>`;
+      return `
+        <div class="rounded-2xl border ${it.status === 'overdue' ? 'border-rose-500/30' : 'border-slate-200 dark:border-slate-800'} bg-slate-50/80 dark:bg-slateDark-850/70 p-4">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 truncate">${escapeHtml(it.subjectName)}</div>
+              <div class="text-base font-bold text-slate-900 dark:text-white mt-0.5 break-words">${escapeHtml(it.chapter)}</div>
+              <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                <span>${escapeHtml(t.rvStudied)}: ${escapeHtml(formatShortDate(it.studyDate))}</span>
+                <span>${escapeHtml(t.rvOrd[it.n - 1] || String(it.n))} ${escapeHtml(t.rvRevision)}</span>
+                <span>${escapeHtml(t.rvDue)}: ${escapeHtml(formatShortDate(it.due))}</span>
+              </div>
+            </div>
+            <span class="self-start shrink-0 px-2.5 py-0.5 rounded-full border text-xs font-semibold ${styles[it.status]}">${escapeHtml(statusText)}</span>
+          </div>
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            ${action}
+            <button type="button" onclick="openStudyDay(${dq})" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slateDark-800 border border-slate-200 dark:border-slate-700 transition cursor-pointer">${escapeHtml(t.rvOpen)}</button>
+          </div>
+        </div>`;
+    }
+
+    function renderOvRevisions() {
+      const t = ovT();
+      const el = document.getElementById('ov-revision');
+      const rev = ovBuildRevisions();
+      const remaining = rev.dueList.length + rev.upList.length;
+      const MAX = 30;
+
+      const tabs = [
+        { id: 'due', label: t.rvTabDue, list: rev.dueList, et: t.rvEmptyDueT, ed: t.rvEmptyDueD },
+        { id: 'up', label: t.rvTabUp, list: rev.upList, et: t.rvEmptyUpT, ed: t.rvEmptyUpD },
+        { id: 'done', label: t.rvTabDone, list: rev.doneList, et: t.rvEmptyDoneT, ed: t.rvEmptyDoneD }
+      ];
+      const cur = tabs.find(x => x.id === ovRevTab) || tabs[0];
+      const shown = cur.list.slice(0, MAX);
+
+      const tabBtns = tabs.map(x => {
+        const on = x.id === cur.id;
+        return `<button type="button" onclick="setRevTab('${x.id}')" aria-pressed="${on}" class="px-3.5 py-1.5 rounded-xl text-sm font-semibold transition cursor-pointer ${on ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-transparent'}">${escapeHtml(x.label)} <span class="text-xs opacity-80">${ovNum(x.list.length)}</span></button>`;
+      }).join('');
+
+      el.innerHTML = ovCard(`
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
+          ${ovTitle(t.rvTitle, t.rvSub)}
+          <div class="flex items-center gap-2 text-xs font-semibold shrink-0">
+            <span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slateDark-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">${escapeHtml(t.rvRemain)}: ${ovNum(remaining)}</span>
+            ${rev.overdueCount ? `<span class="px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30">${escapeHtml(t.rvOverdue)}: ${ovNum(rev.overdueCount)}</span>` : ''}
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mb-4">${tabBtns}</div>
+        <div class="space-y-3">
+          ${shown.length ? shown.map(ovRevItemHtml).join('') : ovEmpty(cur.et, cur.ed)}
+          ${cur.list.length > MAX ? `<div class="text-xs text-center text-slate-400">${escapeHtml(ovFill(t.rvMore, { n: ovNum(cur.list.length - MAX) }))}</div>` : ''}
+        </div>
+        <p class="mt-4 text-xs text-slate-400 dark:text-slate-500">${escapeHtml(t.rvHow)}</p>`, ovAnimate);
+    }
+
+    // =========================================================
+    // 12. DRIVE SYNC via fetch() — owner login (additive)
+    // Visitors: app works locally. Owner: logs in with OWNER_KEY to sync with Drive.
+    // =========================================================
+    const CLOUD_URL = 'PASTE_WEB_APP_URL_HERE';
+    const CLOUD = { enabled: false, loaded: false, timer: null, saving: false, dirty: false, key: null };
+
+    async function cloudCall(action, data) {
+      const res = await fetch(CLOUD_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight
+        body: JSON.stringify({ action, key: CLOUD.key, data })
+      });
+      const out = await res.json();
+      if (!out.ok) throw new Error(out.error || 'request_failed');
+      return out.data;
+    }
+
+    function setCloudStatus(kind) {
+      let el = document.getElementById('cloud-status');
+      if (!el) {
+        const nav = document.getElementById('page-nav');
+        if (!nav) return;
+        nav.style.display = 'flex'; nav.style.flexWrap = 'wrap'; nav.style.alignItems = 'center'; nav.style.gap = '12px';
+        el = document.createElement('span');
+        el.id = 'cloud-status';
+        el.className = 'text-xs text-slate-500 dark:text-slate-400';
+        const btn = document.createElement('button');
+        btn.id = 'cloud-btn'; btn.type = 'button'; btn.onclick = cloudToggleLogin;
+        btn.className = 'text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer';
+        nav.append(el, btn);
+      }
+      const bn = state.lang === 'bn';
+      const map = {
+        off: bn ? 'শুধু এই ডিভাইসে সংরক্ষিত' : 'Saved on this device only',
+        loading: bn ? 'Drive থেকে লোড হচ্ছে…' : 'Loading from Drive…',
+        pending: bn ? 'পরিবর্তন সংরক্ষণের অপেক্ষায়…' : 'Changes pending…',
+        saving: bn ? 'Drive-এ সংরক্ষণ হচ্ছে…' : 'Saving to Drive…',
+        saved: bn ? 'Drive-এ সংরক্ষিত ✓' : 'Saved to Drive ✓',
+        error: bn ? 'সংরক্ষণ ব্যর্থ — আবার চেষ্টা হবে' : 'Save failed — will retry',
+        badkey: bn ? 'কী ভুল' : 'Wrong key',
+        loadfail: bn ? 'Drive থেকে লোড ব্যর্থ (Drive-এর ডেটা অক্ষত আছে)' : 'Could not load from Drive (Drive data untouched)'
+      };
+      el.textContent = map[kind] || '';
+      document.getElementById('cloud-btn').textContent = CLOUD.enabled ? (bn ? 'লগআউট' : 'Log out') : (bn ? 'মালিক লগইন' : 'Owner login');
+    }
+
+    const __localSaveState = saveState; // wrap, not edit
+    saveState = function () { __localSaveState(); cloudScheduleSave(); };
+
+    function cloudScheduleSave() {
+      if (!CLOUD.enabled || !CLOUD.loaded) return; // never write to Drive before a successful load
+      CLOUD.dirty = true;
+      clearTimeout(CLOUD.timer);
+      setCloudStatus('pending');
+      CLOUD.timer = setTimeout(cloudPush, 1500);
+    }
+
+    async function cloudPush() {
+      if (CLOUD.saving) { CLOUD.timer = setTimeout(cloudPush, 1000); return; }
+      CLOUD.saving = true; CLOUD.dirty = false; setCloudStatus('saving');
+      try {
+        await cloudCall('save', JSON.stringify(state));
+        setCloudStatus(CLOUD.dirty ? 'pending' : 'saved');
+      } catch (e) {
+        CLOUD.dirty = true; setCloudStatus('error');
+        CLOUD.timer = setTimeout(cloudPush, 10000);
+      } finally { CLOUD.saving = false; }
+    }
+
+    async function cloudLogin(silent) {
+      if (!CLOUD_URL || CLOUD_URL.startsWith('PASTE')) { if (!silent) alert('CLOUD_URL সেট করা হয়নি / CLOUD_URL not set'); return; }
+      const key = silent ? sessionStorage.getItem('hsc_key') : prompt(state.lang === 'bn' ? 'মালিকের কী (পাসফ্রেজ) দিন:' : 'Enter owner key:');
+      if (!key) return;
+      CLOUD.key = key; setCloudStatus('loading');
+      try {
+        const raw = await cloudCall('load');
+        sessionStorage.setItem('hsc_key', key);
+        CLOUD.enabled = true;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.config && parsed.logs) {
+            parsed.selectedDate = getLocalTodayStr();
+            state = parsed; __localSaveState();
+            if (!sessionStorage.getItem('hsc_reloaded')) { sessionStorage.setItem('hsc_reloaded', '1'); location.reload(); return; }
+            renderAll();
+          }
+        }
+        CLOUD.loaded = true;
+        if (!raw) cloudScheduleSave(); else setCloudStatus('saved'); // first login: upload current data
+      } catch (e) {
+        CLOUD.key = null; CLOUD.enabled = false; sessionStorage.removeItem('hsc_key');
+        setCloudStatus(e.message === 'unauthorized' ? 'badkey' : 'loadfail');
+      }
+    }
+
+    function cloudToggleLogin() {
+      if (CLOUD.enabled) {
+        CLOUD.enabled = false; CLOUD.loaded = false; CLOUD.key = null;
+        sessionStorage.removeItem('hsc_key'); sessionStorage.removeItem('hsc_reloaded');
+        setCloudStatus('off');
+      } else cloudLogin(false);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && CLOUD.enabled && CLOUD.loaded && CLOUD.dirty) { clearTimeout(CLOUD.timer); cloudPush(); }
+    });
+
+    // Boot App
+    window.addEventListener('DOMContentLoaded', () => {
+      initApp();
+      setCloudStatus('off');
+      if (sessionStorage.getItem('hsc_key')) cloudLogin(true);
+    });
+  </script>
+  <section id="seo-info" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-sm leading-relaxed text-slate-500 dark:text-slate-400 font-bangla">
+    <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-1">HSC Life Countdown ও Academic Tracker</h2>
+    <p class="mb-5">এটি HSC পরীক্ষার্থীদের জন্য একটি বিনামূল্যের বাংলা স্টাডি ট্র্যাকার। এখানে আছে HSC পরীক্ষার কাউন্টডাউন, লাইফ ক্যালেন্ডার, বিষয়ভিত্তিক সিলেবাস সম্পন্নের হার, দৈনিক পড়ার সময়ের হিসাব, স্টাডি স্ট্রিক, ডেইলি জার্নাল এবং পড়ার ১, ৩ ও ৭ দিন পর স্বয়ংক্রিয় রিভিশন রিমাইন্ডার।</p>
+    <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-1">HSC Life Countdown &amp; Academic Tracker</h2>
+    <p>A free Bangla study tracker for HSC students: exam countdown, life calendar, syllabus completion by subject, daily study hours, streaks, a daily journal, and automatic spaced-repetition revision reminders at 1, 3 and 7 days.</p>
+  </section>
+  <noscript><p style="padding:1rem">এই অ্যাপ চালাতে JavaScript চালু করুন। Please enable JavaScript to use this tracker.</p></noscript>
+</body>
+</html>
