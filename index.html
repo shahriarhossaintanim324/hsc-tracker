@@ -2944,7 +2944,7 @@
         loadfail: bn ? 'Drive থেকে লোড ব্যর্থ (Drive-এর ডেটা অক্ষত আছে)' : 'Could not load from Drive (Drive data untouched)'
       };
       el.textContent = map[kind] || '';
-      document.getElementById('cloud-btn').textContent = CLOUD.enabled ? (bn ? 'লগআউট' : 'Log out') : (bn ? 'মালিক লগইন' : 'Owner login');
+      document.getElementById('cloud-btn').textContent = CLOUD.enabled ? (bn ? 'লগআউট' : 'Log out') : (bn ? 'এডমিন লগইন' : 'Admin login');
     }
 
     const __localSaveState = saveState; // wrap, not edit
@@ -2972,7 +2972,7 @@
 
     async function cloudLogin(silent) {
       if (!CLOUD_URL || CLOUD_URL.startsWith('PASTE')) { if (!silent) alert('CLOUD_URL সেট করা হয়নি / CLOUD_URL not set'); return; }
-      const key = silent ? sessionStorage.getItem('hsc_key') : prompt(state.lang === 'bn' ? 'মালিকের কী (পাসফ্রেজ) দিন:' : 'Enter owner key:');
+      const key = silent ? sessionStorage.getItem('hsc_key') : prompt(state.lang === 'bn' ? 'পাসওয়ার্ড দিন :' : 'Enter password :');
       if (!key) return;
       CLOUD.key = key; setCloudStatus('loading');
       try {
